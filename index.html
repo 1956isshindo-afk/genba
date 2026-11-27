@@ -353,7 +353,7 @@ const V={}, B={};
 
 /* ----- ホーム ----- */
 const ROLES={'':'すべて使う','att':'勤怠専用（入口に置く端末）','work':'作業用（出退勤を出さない）'};
-const APP_VER='11/27 22:30';   // 画面の一番下に表示（どの版で開いているか確認用）
+const APP_VER='11/27 23:00';   // 画面の一番下に表示（どの版で開いているか確認用）
 const role=()=>S.role!==undefined&&S.role!==null?S.role:(REAL_ADMIN?'':'work');   // スタッフの端末は、決めていなければ「作業用」
 function roleFoot(){return `<p class="note" style="margin:4px 0 0;text-align:center;font-size:11px">アプリの版：${APP_VER}</p><p class="note" style="margin-top:6px;text-align:center"><a href="#" id="roleBtn" style="color:inherit">この端末の役割：${esc(ROLES[role()]||ROLES[''])} ▸</a></p>`;}
 function roleSheet(){const m=sheet(`<h2 style="margin-top:0">この端末の役割</h2><p class="note">端末ごとに決めます。まちがって押すのを防ぐための設定です。</p>
@@ -808,14 +808,17 @@ B.maint=()=>{const f=ui.f;const p=(a,k)=>$$(`[${a}]`).forEach(el=>el.onclick=()=
 
 /* ----- 写真 ----- */
 const PCAT=()=>Object.keys(cfg('photo')||{});
-V.photo=()=>{const f=ui.f||(ui.f={cat:'',key:''});const recent=nearCases();
+const PABOUT=['品物・案件','作業のやり方','段取り・準備','機械・道具','置き場・環境','安全'];
+V.photo=()=>{const f=ui.f||(ui.f={cat:'',key:'',about:''});const recent=nearCases();
   return bar('写真','home')+`<div class="wrap"><div class="card">
   ${BOARD.photos?`<div class="hkb" style="margin-top:0">📷 Dropboxに届いた写真（全員分）：今日 <b>${(BOARD.photos[ymd(Date.now())]||0)}</b>枚・この7日 <b>${Object.entries(BOARD.photos).filter(([d])=>d>=ymd(Date.now()-6*86400000)).reduce((a,[,n])=>a+n,0)}</b>枚<span class="note">（${esc(BOARD.updated||'')}時点）</span></div>`:''}
   <label class="f" style="margin-top:0">① 分類</label><div class="chips">${PCAT().length?'':'<p class="note">送信先がまだ読み込めていません。少し待つか、管理者に確認してください。</p>'}${PCAT().map(x=>`<div class="chip ${f.cat===x?'on':''}" data-cat="${esc(x)}">${esc(x)}</div>`).join('')}</div>
-  <label class="f">② 案件（任意）</label><div class="pchips">${recent.map(c=>`<div class="pchip ${f.key===c.key?'on':''}" data-pk="${esc(c.key)}">${esc((c.item||'').slice(0,16))}</div>`).join('')}<div class="pchip ${f.key==='__none'?'on':''}" data-pk="__none">指定なし</div></div>
-  <label class="f">品名（一覧にないときは手入力）</label><input id="pItem" placeholder="例：桐箱用台紙" value="${esc(f.item||'')}">
+  <label class="f">② 何についての写真？</label><div class="chips">${PABOUT.map(x=>`<div class="chip ${f.about===x?'on':''}" data-ab="${esc(x)}">${esc(x)}</div>`).join('')}</div>
+  ${f.about==='品物・案件'?`<label class="f">案件（一覧から）</label><div class="pchips">${recent.map(c=>`<div class="pchip ${f.key===c.key?'on':''}" data-pk="${esc(c.key)}">${esc((c.item||'').slice(0,16))}</div>`).join('')}<div class="pchip ${f.key==='__none'?'on':''}" data-pk="__none">一覧にない</div></div>
+  <label class="f">品名（一覧にないときは手入力）</label><input id="pItem" placeholder="例：桐箱用台紙" value="${esc(f.item||'')}">`:''}
+  <label class="f">タイトル（短く・20字まで）</label><input id="pTitle" maxlength="20" placeholder="例：桐箱用台紙の梱包" value="${esc(f.title||'')}">
   <label class="f">メモ（任意）</label><textarea id="pMemo" rows="2" placeholder="例：要専用カートン検討">${esc(f.memo||'')}</textarea>
-  <p class="note">品名かメモを書いたときは、写真のあとに「メモを送る」画面が出ます（Formsで送信）。</p>
+  <p class="note">タイトルかメモを書いたときは、写真のあとに「メモを送る」画面が出ます（Formsで送信）。</p>
   <label class="f">③ 写真を選ぶ（この端末の記録用）</label><input type="file" accept="image/*" id="pFile">
   <div id="pPrev" class="thumbs" style="margin-top:8px"></div>
   <a class="btn blue big block ${f.cat?'':'hidden'}" id="pSend" href="${esc(cfg('photo')[f.cat]||'#')}" target="_blank" rel="noopener">④ Dropboxに送る（${esc(f.cat||'')}）</a>
@@ -824,16 +827,17 @@ V.photo=()=>{const f=ui.f||(ui.f={cat:'',key:''});const recent=nearCases();
 B.photo=()=>{const f=ui.f;
   $$('[data-cat]').forEach(el=>el.onclick=()=>{f.cat=el.dataset.cat;render();});
   $$('[data-pk]').forEach(el=>el.onclick=()=>{f.key=el.dataset.pk;render();});
-  $('#pItem').oninput=e=>{f.item=e.target.value;};$('#pMemo').oninput=e=>{f.memo=e.target.value;};
+  $$('[data-ab]').forEach(el=>el.onclick=()=>{f.about=f.about===el.dataset.ab?'':el.dataset.ab;if(f.about!=='品物・案件'){f.key='';f.item='';}render();});
+  const pi=$('#pItem');if(pi)pi.oninput=e=>{f.item=e.target.value;};$('#pTitle').oninput=e=>{f.title=e.target.value;};$('#pMemo').oninput=e=>{f.memo=e.target.value;};
   $('#pFile').onchange=e=>{const file=e.target.files[0];if(!file)return;const img=new Image();const u=URL.createObjectURL(file);
     img.onload=()=>{const c=document.createElement('canvas');const s=Math.min(1,320/Math.max(img.width,img.height));c.width=img.width*s;c.height=img.height*s;
       c.getContext('2d').drawImage(img,0,0,c.width,c.height);f.thumb=c.toDataURL('image/jpeg',0.6);$('#pPrev').innerHTML=`<figure><img src="${f.thumb}"></figure>`;URL.revokeObjectURL(u);};img.src=u;};
   const s=$('#pSend');if(s)s.addEventListener('click',()=>{const c=f.key&&f.key!=='__none'?caseBy(f.key):null;
-    const it=(f.item||'').trim(),mm=(f.memo||'').trim();
-    S.photos.push({d:ymd(Date.now()),cat:f.cat,item:it||(c?c.item:''),memo:mm,img:f.thumb||''});if(S.photos.length>60)S.photos=S.photos.slice(-60);
+    const it=(f.item||'').trim(),mm=(f.memo||'').trim(),tt=(f.title||'').trim().slice(0,20);
+    S.photos.push({d:ymd(Date.now()),cat:f.cat,about:f.about||'',item:tt||it||(c?c.item:''),memo:mm,img:f.thumb||''});if(S.photos.length>60)S.photos=S.photos.slice(-60);
     const n=bump('photo');let rec=null;
-    if(it||mm)rec=queue({QQKIND:'写真',QQDATE:ymd(Date.now()),QQCASE:c?c.key:'',QQPART:[f.cat,it].filter(Boolean).join('｜'),QQWORKERS:S.name||'',QQMEMO:mm});
-    save();f.thumb='';f.item='';f.memo='';
+    if(tt||mm||it)rec=queue({QQKIND:'写真',QQDATE:ymd(Date.now()),QQCASE:c?c.key:'',QQPART:[f.cat,f.about||'未選択',it,tt].filter(Boolean).join('｜'),QQWORKERS:S.name||'',QQMEMO:mm});
+    save();f.thumb='';f.item='';f.memo='';f.title='';f.about='';f.key='';
     setTimeout(()=>{render();if(rec)sendSheet(rec,'写真のメモを記録しました');else celebrate('photo','送信画面を開いたよ',n,'Dropboxの画面で写真を選んで「アップロード」まで押してね。届いた枚数は次の集計で上に出ます。');},700);});
 };
 
