@@ -353,7 +353,7 @@ const V={}, B={};
 
 /* ----- ホーム ----- */
 const ROLES={'':'すべて使う','att':'勤怠専用（入口に置く端末）','work':'作業用（出退勤を出さない）'};
-const APP_VER='11/27 22:00';   // 画面の一番下に表示（どの版で開いているか確認用）
+const APP_VER='11/27 22:30';   // 画面の一番下に表示（どの版で開いているか確認用）
 const role=()=>S.role!==undefined&&S.role!==null?S.role:(REAL_ADMIN?'':'work');   // スタッフの端末は、決めていなければ「作業用」
 function roleFoot(){return `<p class="note" style="margin:4px 0 0;text-align:center;font-size:11px">アプリの版：${APP_VER}</p><p class="note" style="margin-top:6px;text-align:center"><a href="#" id="roleBtn" style="color:inherit">この端末の役割：${esc(ROLES[role()]||ROLES[''])} ▸</a></p>`;}
 function roleSheet(){const m=sheet(`<h2 style="margin-top:0">この端末の役割</h2><p class="note">端末ごとに決めます。まちがって押すのを防ぐための設定です。</p>
@@ -639,6 +639,13 @@ function qtyFields(j){const g=j.part.split('｜')[0];const q=j.q||{};const num=(
   if(g==='セット')return `<label class="f">セットできた数（個）</label>${num('mq0')}<label class="f">足りない・不良（個）</label>${num('mBad','0')}`;
   if(g==='検品・梱包')return `<label class="f">良品数（個）</label>${num('mq0')}<label class="f">不良（個）</label>${num('mBad','0')}`;
   return '';}
+function prevDone(j){const dm=(DATA.done||{})[j.caseKey]?.['@'+j.part]||{};let n=Object.values(dm).reduce((a,v)=>a+(+v||0),0);
+  const t0=DATA.updated?new Date(DATA.updated.replace(' ','T')+':00').getTime():0;
+  (S.doneLog||[]).filter(x=>x.key===j.caseKey&&x.part===j.part&&x.t>t0&&x.id!==j.id).forEach(x=>{if(/^\d+$/.test(String(x.q)))n+=+x.q;});return n;}
+function totBox(j){return `<div id="mTotBox" style="margin-top:10px;background:#f3f7f4;border:2px solid #cfe3d6;border-radius:12px;padding:10px">
+  <div class="note" style="color:var(--ink)">この工程のこれまでの記録：<b id="mPrev">${prevDone(j)}</b>個${j.qty?`／ロット ${esc(j.qty)}個`:''}</div>
+  <label class="f" style="margin-top:6px">このロットで合計いくつ終わった？</label><input id="mTot" type="number" inputmode="numeric" min="0" placeholder="合計を入れると今回の数が自動で入ります">
+  <p class="note" style="margin:4px 0 0">下の今回の数に自動で入ります。今回の数を直接直してもOK。数が合わないときは下の「数のメモ」に書いてね。</p></div>`;}
 function qtyValue(j,m){const g=j.part.split('｜')[0];const v=id=>{const e=m.querySelector('#'+id);return e?e.value.trim():'';};
   if(g==='貼り'){const ps=(j.part.split('｜')[1]||'').split('・');return ps.length>1?ps.map((p,i)=>`${p}${v('mq'+i)||0}`).join('・'):v('mq0');}
   return v('mq0');}
@@ -656,7 +663,8 @@ function finishJob(j0,endAt){const j=JSON.parse(JSON.stringify(j0));
    <div class="kv"><div>案件</div><div>${esc(j.item)}${jobMeta(j)?`<div class="note">${jobMeta(j)}</div>`:''}</div><div>部品</div><div>${esc(j.part)}</div><div>作業者</div><div>${esc(j.workers.join('・'))}（${n}人）</div>
    <div>時間</div><div id="mTm"></div><div>人時</div><div><b id="mMH"></b></div></div><div id="mPace"></div>
    ${j.late?`<p class="note">あとから入力（${md(ymd(j.startAt))}）</p>`:`<details style="margin-top:8px"><summary class="note" style="font-size:15px">終了時刻を直す（完了の押し忘れ）</summary><input type="time" id="mEnd" style="margin-top:8px"><p class="note">本当に終わった時刻を入れてください。</p></details>`}
-   ${qtyFields(j)}${j.pre?`<p class="note" style="color:var(--ink)">記録を始める前の ${j.pre}個 も含めた、今日できた合計を入れてね。</p>`:''}
+   ${!/^貼り｜[^｜]*・/.test(j.part)&&/^(貼り|前加工|セット|検品・梱包)/.test(j.part)?totBox(j):''}${qtyFields(j)}<label class="f">数のメモ（任意）</label><input id="mQMemo" placeholder="例：数え直して+20個／前日分を含む">
+   <p id="mQErr" style="display:none;color:#c0392b;font-weight:900;margin:6px 0 0"></p>${j.pre?`<p class="note" style="color:var(--ink)">記録を始める前の ${j.pre}個 も含めた、今日できた合計を入れてね。</p>`:''}
 
    <details style="margin-top:12px"><summary class="note" style="font-size:15px">メモを書く（任意）</summary><input id="mMemo" placeholder="例：糊の乾き待ちで30分止まった" style="margin-top:8px"></details>
    <button class="btn fill big block" id="mOk">記録して送る</button><button class="btn block" id="mNo">作業に戻る</button>`);
@@ -669,10 +677,19 @@ function finishJob(j0,endAt){const j=JSON.parse(JSON.stringify(j0));
   const pick=(attr,set)=>m.querySelectorAll(`[${attr}]`).forEach(el=>el.onclick=()=>{m.querySelectorAll(`[${attr}]`).forEach(x=>x.classList.remove('on'));el.classList.add('on');set(el.getAttribute(attr));});
 
 
+  let qAuto=false,qHand=false;const mT=m.querySelector('#mTot'),mQ=m.querySelector('#mq0');
+  m.querySelectorAll('input').forEach(e=>e.addEventListener('input',()=>{const er=m.querySelector('#mQErr');if(er)er.style.display='none';}));
+  if(mT&&mQ){const pv=()=>+m.querySelector('#mPrev').textContent||0;
+    mT.oninput=()=>{if(mT.value===''){return;}const v=Math.max(0,(+mT.value)-pv());mQ.value=v;qAuto=true;qHand=false;};
+    mQ.addEventListener('input',()=>{if(qAuto)qHand=true;if(mQ.value!=='')mT.value=pv()+(+mQ.value);});}
   upd();
   if(j.late)m.querySelector('#mNo').textContent='やめる';
   m.querySelector('#mNo').onclick=()=>m.remove();
-  m.querySelector('#mOk').onclick=()=>{if(j.late)wm=work(j,end);wl();
+  m.querySelector('#mOk').onclick=()=>{const qs=[...m.querySelectorAll('input[id^="mq"]')].filter(e=>/^mq\d+$/.test(e.id));const er=m.querySelector('#mQErr');const qm=(m.querySelector('#mQMemo').value||'').trim();
+    if(qs.some(e=>e.value.trim()==='')){er.style.display='block';er.textContent='⚠ 個数が入っていません。できた数を入れてください（できなかったときは 0 と入れて、数のメモに理由を）。';qs.find(e=>e.value.trim()==='').focus();return;}
+    if(qs.some(e=>+e.value===0)&&!qm){er.style.display='block';er.textContent='⚠ 0個のときは、数のメモに理由を書いてください。';m.querySelector('#mQMemo').focus();return;}
+    if(j.late)wm=work(j,end);wl();
+    const tv=mT&&mT.value!==''?mT.value:'';memos=memos.concat(tv?['ロット累計'+tv+(qHand?'・今回の数を手入力':'')]:[]).concat(qm?['数メモ:'+qm]:[]);
     const rec=queue({QQKIND:'作業日報',QQDATE:ymd(j.startAt),QQCASE:j.caseKey,QQPART:j.part,QQWORKERS:j.workers.join('・'),QQNUM:n,
       QQSTART:hm(j.startAt),QQEND:hm(end),QQWORK:r1(wm/60000),QQPAUSE:r1(paused(j,end)/60000),
       QQADJ:(j.wlog||[]).length?'人の入れ替え '+[(j.workers0||j.workers).length+'人'].concat(j.wlog.map(x=>`${hm(x.t)}→${x.w.length}人`)).join(' '):adj.map(x=>`${x.k==='+'?'応援':'中抜け'}${x.n}人×${x.m}分`).join('・'),QQMH:mh(),
