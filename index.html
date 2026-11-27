@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>一新堂 現場アプリ</title>
+<style>
+:root{--bg:#f7f4ec;--card:#fffdf8;--ink:#3b3a34;--sub:#8b877b;--line:#ebe5d6;--head:#fffdf8;--main:#4f9a78;--main2:#e6f2ea;
+  --warn:#e39a5b;--stop:#d9685a;--blue:#5b97c9;--r:20px;--sh:0 2px 10px rgba(120,100,60,.08)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic UI",sans-serif;font-size:17px;line-height:1.5}
+.bar{background:var(--head);color:var(--ink);border-bottom:1px solid var(--line);padding:12px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
+.bar h1{font-size:18px;margin:0;flex:1;font-weight:700}
+.bar .who{font-size:13px;color:#cfdde3;cursor:pointer;border:1px solid #4d6673;border-radius:99px;padding:4px 12px;white-space:nowrap}
+.bar .back{background:var(--main2);border:none;color:var(--main);border-radius:99px;width:36px;height:36px;padding:0;font-size:24px;padding:0 6px 0 0;cursor:pointer;line-height:1}
+.wrap{max-width:560px;margin:0 auto;padding:14px 14px 56px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px;box-shadow:var(--sh)}
+.card h2{font-size:17px;margin:0 0 8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 10px;text-align:center;font-size:17px;font-weight:700;cursor:pointer;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--ink);box-shadow:var(--sh)}
+.ico{width:52px;height:52px;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+.ico svg{width:30px;height:30px}
+.hello{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;box-shadow:var(--sh)}
+.hello .msg{flex:1}.hello .msg b{display:block;font-size:18px}.hello .msg span{font-size:13px;color:var(--sub)}
+.bubble{background:var(--main2);border-radius:14px;padding:8px 12px;font-size:14px;margin-top:4px;display:inline-block}
+.tile small{font-weight:400;font-size:12px;color:var(--sub)}
+.tile.main{background:linear-gradient(135deg,#5fae89,#4f9a78);color:#fff;border-color:transparent;grid-column:1/-1;min-height:150px;font-size:27px;box-shadow:0 8px 22px rgba(79,154,120,.35);flex-direction:row;justify-content:flex-start;padding-left:22px;gap:14px;text-align:left}
+.tile.main small{color:#e3f3ea;display:block;font-size:14px}.tile.main .ico{background:rgba(255,255,255,.22);margin:0;width:68px;height:68px}.tile.main .ico svg{width:38px;height:38px}
+.tile.wide{grid-column:1/-1;flex-direction:row;justify-content:flex-start;padding-left:22px;gap:14px;text-align:left;min-height:84px;font-size:20px;border:2px solid #f3c99b}
+.tile.wide .ico{margin:0}.tile.wide small{display:block;font-size:13px}
+.badge{display:inline-block;background:#fff;color:var(--main);font-size:12px;border-radius:99px;padding:1px 9px;margin-top:4px;font-weight:700}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--main);background:#fff;color:var(--main);border-radius:99px;padding:13px 16px;font-size:17px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;min-width:92px;font-family:inherit}
+.btn.fill{background:var(--main);color:#fff}.btn.warn{background:var(--warn);border-color:var(--warn);color:#fff}
+.btn.stop{background:var(--stop);border-color:var(--stop);color:#fff}.btn.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.block{display:flex;width:100%;margin-top:10px}.btn.sm{padding:7px 12px;font-size:14px;min-width:0}.btn.big{padding:20px;font-size:21px}
+.btn:disabled{opacity:.35}
+.btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+label.f{display:block;font-size:14px;color:var(--sub);margin:14px 0 6px;font-weight:600}
+input,select,textarea{width:100%;font-size:17px;padding:12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-family:inherit}
+textarea{font-size:15px}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.chips.c2{grid-template-columns:1fr 1fr}.chips.c4{grid-template-columns:repeat(4,1fr)}.chips.c3{grid-template-columns:repeat(3,1fr)}
+.chip{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50px;border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:6px 4px;font-size:15px;text-align:center;cursor:pointer;font-weight:600;user-select:none}
+.chip small{font-weight:400;font-size:11px;color:var(--sub)}
+.chip.on{background:var(--main);color:#fff;border-color:var(--main)}.chip.on small{color:#d4e8e5}
+.person{display:flex;align-items:center;gap:10px;background:#f2eee4;border-radius:16px;padding:13px 12px;cursor:pointer;font-size:17px;user-select:none}
+.person .box{width:24px;height:24px;border:2px solid #8a9599;border-radius:7px;background:#fff;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px}
+.person.on{background:var(--main2)}.person.on .box{background:var(--main);border-color:var(--main)}
+.case{border:1.5px solid var(--line);border-radius:18px;padding:12px;margin-bottom:10px;background:#fff}
+.case.on{border-color:var(--main);background:#f6faf9}
+.case .cl{font-size:13px;color:var(--sub)}.case .it{font-weight:700;font-size:16px;line-height:1.35;margin:2px 0 8px}
+.case .meta{font-size:12px;color:var(--sub);margin-bottom:8px}
+.pchips{display:flex;flex-wrap:wrap;gap:6px}
+.pchip{border:1.5px solid var(--line);border-radius:99px;padding:8px 12px;font-size:15px;font-weight:600;cursor:pointer;background:#fff;user-select:none}
+.pchip small{font-weight:400;color:var(--sub);margin-left:4px}
+.pchip.on{background:var(--main);color:#fff;border-color:var(--main)}.pchip.on small{color:#d4e8e5}
+.pchip.today{border-color:#9fcdb5;background:#f3faf5}
+.pchip.today.on{background:var(--main);border-color:var(--main);color:#fff}
+.job .ttl{font-size:18px;font-weight:700;line-height:1.35}.job .st{font-size:14px;color:var(--main);margin-top:4px}.job .st.p{color:var(--warn)}
+.timer{font-size:50px;font-weight:700;font-variant-numeric:tabular-nums;margin:2px 0;font-family:ui-monospace,Menlo,monospace}.timer.tsm{font-size:26px;color:#7a7e88;margin:0}
+.note{font-size:13px;color:var(--sub)}
+.alert{background:#fbf1e3;border:1px solid #ecd3b0;border-radius:10px;padding:10px 12px;font-size:14px;margin-bottom:14px}
+.info{background:#e8edf0;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:14px;color:#3b4a51}
+.seg{display:flex;background:#efe9dc;border-radius:99px;padding:3px;margin-bottom:12px;gap:2px}
+.seg div{flex:1;text-align:center;padding:9px 4px;border-radius:99px;cursor:pointer;font-size:14px;font-weight:600;color:var(--sub)}
+.seg .on{background:#fff;color:var(--ink)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:7px 4px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+th:first-child,td:first-child{text-align:left}th{color:var(--sub);font-weight:600;font-size:12px}
+.li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.li:last-child{border-bottom:none}.li .t{flex:1}
+.x{border:none;background:#f3e3e1;color:var(--stop);border-radius:8px;width:40px;height:36px;font-size:18px;cursor:pointer}
+.addrow{display:flex;gap:8px;margin-top:10px}.addrow input{flex:1}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:4px 10px;font-size:15px}.kv>div:nth-child(odd){color:var(--sub)}
+.big3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.big3 div{background:#eef5f8;border-radius:10px;padding:10px;text-align:center}.big3 b{display:block;font-size:22px}.big3 span{font-size:12px;color:var(--sub)}
+.clock{text-align:center;background:var(--main2);border-radius:12px;padding:12px}.clock b{font-size:44px;font-variant-numeric:tabular-nums;display:block;line-height:1.1}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:12px}
+.cal div{background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px 2px;min-height:46px}
+.cal .h{background:none;border:none;min-height:0;color:var(--sub)}.cal .w{background:var(--main2);border-color:#a9cbc6}.cal b{display:block;font-size:13px}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.thumbs figure{margin:0}.thumbs img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px}
+.thumbs figcaption{font-size:11px;color:var(--sub);line-height:1.3}
+.hidden{display:none!important}
+.dock{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:2px solid var(--main);border-radius:22px 22px 0 0;box-shadow:0 -4px 16px rgba(0,0,0,.12);z-index:8;padding:12px 14px 16px}
+.dock .in{max-width:560px;margin:0 auto}.dock .sel{font-size:14px;margin-bottom:8px}.dock .sel b{font-size:16px}
+.lbl{font-size:12px;color:var(--sub);display:block;margin-bottom:3px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.modal .sheet{background:var(--card);width:100%;max-width:560px;border-radius:24px 24px 0 0;padding:18px 16px 26px;max-height:92vh;overflow:auto}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#1e2a30;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:30;max-width:90%}
+svg text{font-family:inherit}
+.sheetA4{background:#fff;color:#000;padding:16px;border:1px solid #999}
+.confetti{position:fixed;top:-12px;width:9px;height:14px;z-index:99;pointer-events:none;animation:cf 2.4s ease-in forwards}@keyframes cf{to{transform:translateY(110vh) rotate(540deg);opacity:.9}}
+.stack .bx{animation:drop .6s cubic-bezier(.3,1.4,.5,1) backwards}@keyframes drop{from{transform:translateY(-60px);opacity:0}}
+.hk-jump{animation:hkj .9s ease-out 1}@keyframes hkj{0%{transform:translateY(0) scale(1)}25%{transform:translateY(-14px) scale(1.08)}45%{transform:translateY(0) scale(.96)}60%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+.hkb{background:#fff7e6;border:1px solid #f0d3a6;border-radius:14px;padding:8px 12px;font-size:15px;margin:2px 0 10px}
+.news{border:2px solid #e3a86a;background:#fffaf0}.news .new{background:#e0604f;color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;margin-left:6px}
+.tile{position:relative}.ro input,.ro textarea,.ro button,.ro .chip,.ro .x,.ro [data-edit]{pointer-events:none}.ro .addrow,.ro .x,.ro button{display:none}.wip{position:absolute;top:8px;right:8px;font-size:11px;font-weight:700;color:#5a4500;padding:2px 8px;border-radius:999px;background:repeating-linear-gradient(-45deg,#ffd84d 0 6px,#ffe98f 6px 12px);border:1px solid #d9b100}
+.tile.dim .ico,.tile.dim{opacity:.92}
+.qnow{background:var(--main2);border-radius:14px;padding:8px 12px;margin:8px 0;font-size:16px}.qnow b{font-size:20px}
+.a4head{display:flex;align-items:center;gap:10px;border-bottom:2px solid #333;padding-bottom:6px;margin-bottom:10px}
+.a4icons{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.a4icons div{border:1px solid #999;border-radius:8px;padding:6px 8px;text-align:center;font-size:12px;width:78px}
+.a4icons svg{width:44px;height:44px;display:block;margin:0 auto 2px}
+.a4w{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}.a4w div{border:2px solid #333;border-radius:8px;padding:6px;text-align:center}.a4w span{font-size:11px;display:block}.a4w b{font-size:20px}
+@media print{body>*:not(.modal){display:none!important}.modal{position:static!important;background:none!important}.modal .sheet{box-shadow:none!important;max-height:none!important;overflow:visible!important}.noprint{display:none!important}}
+.sheetA4 h3{margin:0 0 6px;font-size:20px}.sheetA4 th{white-space:nowrap;width:64px;font-size:12px;background:#f3f3f3}.sheetA4 td{text-align:left}.sheetA4 table td,.sheetA4 table th{border:1px solid #999;padding:6px}
+</style>
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="一新堂 現場"><link rel="apple-touch-icon" href="assets/greeting.png"><link rel="manifest" href="manifest.json"></head>
+<body>
+<div id="app"></div>
+<script>
+/* =====================================================================
+   一新堂 現場アプリ v2
+   - 案件：受注一覧「社長作成」シートを自動で読み込んだ cases.json（読むだけ。受注一覧には書き込まない）
+   - 記録：Microsoft Forms（入力済みリンク）→ 社長の OneDrive の Excel に貯まる
+   - 写真：Dropbox ファイルリクエスト（分類ごとのフォルダ）
+   ===================================================================== */
+
+/* ---------- 組み込み設定（ここを変えて公開すると全端末に反映） ---------- */
+const BUILTIN = {
+  staff: [],                                   // 例：['山田','佐藤']
+  machines: ['断裁機','抜き機','箔押し機','貼り機','レーザー加工機','プロッター','半自動機'],
+  forms: '',  // Forms「現場記録」入力済みリンク
+  workStart: '08:30', breaks: ['12:00-13:00'],
+  preProcs: ['断裁','ハス切','罫線','箔押し','抜き','隅留','レーザー','プロッター','その他'],
+  hariParts: ['ミ','フタ','中箱','表紙','内貼り','貼合','底貼り','台紙貼り'],
+  hariMethods: ['手加工','クルミ機','ラッパー','自動表紙','ハイエンド加工'],
+  profiles: {}, places:['トイレ','休憩室','作業場','事務所','外回り'], defectUrl:'',                                // 名前ごとの勤務時間 {type,start,end,breaks}
+  photo: {}, paperLocs:['棚1','棚2','棚3','パレット']
+};
+const CARTONS = [
+  {id:'IS-No.2',size:'80',L:334,W:239,H:140,g:350},{id:'IS-No.3',size:'100',L:360,W:340,H:250,g:650},
+  {id:'IS-120',size:'120',L:471,W:317,H:377,g:950},{id:'IS-140A',size:'140',L:475,W:381,H:508,g:1300},
+  {id:'IS-140B',size:'140',L:719,W:434,H:211,g:1250},{id:'IS-160A',size:'160',L:639,W:484,H:441,g:1800},
+  {id:'IS-160B',size:'160',L:719,W:434,H:411,g:1900},{id:'IS-160C',size:'160',L:507,W:507,H:549,g:2000}
+];
+const cartons=()=>{const c=cfg('cartons');return c&&c.length?c:CARTONS;};
+const OTHER_WORK = ['段取り','清掃・片付け','材料準備','打合せ','サンプル','その他'];
+const TOKENS = {QQKIND:'種別',QQRID:'記録ID',QQDATE:'日付',QQNAME:'入力者',QQCASE:'案件',QQPART:'部品・工程',QQWORKERS:'作業者',
+  QQNUM:'人数',QQSTART:'開始',QQEND:'終了',QQWORK:'作業分',QQPAUSE:'中断分',QQADJ:'応援・中抜け',QQMH:'人時',QQGOOD:'数量',
+  QQBAD:'不足・不良',QQPLAN:'予定',QQMEMO:'メモ'};
+
+/* ---------- 保存 ---------- */
+const KEY='isshindo_field_v2';
+let S; try{S=JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){}
+S=Object.assign({name:'',staff:null,machines:null,forms:null,workStart:null,breaks:null,preProcs:null,paperLocs:null,hariParts:null,hariMethods:null,profiles:null,lastMethod:'',extraCases:[],
+  jobs:[],unsent:[],att:{},maint:[],weights:[],photos:[],packs:[]},S||{});
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist().catch(()=>{});}catch(e){}
+if(!S.born){S.born=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+const SHARED_KEYS=['paperLocs','staff','machines','preProcs','hariParts','hariMethods','profiles','cartons','forms','photo','places','defectUrl','packSpecs','packOpt','kaizenDone','kaizenGoal'];
+let CONF={},confState='loading',ADMIN=null,ART=null,REAL_ADMIN=false;
+const has=v=>v!==null&&v!==undefined;
+const cfg=k=>{if(SHARED_KEYS.includes(k)){if(ADMIN&&has(S[k]))return S[k];if(has(CONF[k]))return CONF[k];}return has(S[k])?S[k]:BUILTIN[k];};
+const dirtyKeys=()=>SHARED_KEYS.filter(k=>has(S[k])&&JSON.stringify(S[k])!==JSON.stringify(has(CONF[k])?CONF[k]:BUILTIN[k]));
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){toast('この端末に保存できませんでした');}pushLive();}
+async function publishConf(pc){if(pc){pc.disabled=true;pc.textContent='反映中…';}else toast('全員に反映しています…');
+    const next=Object.assign({},CONF);SHARED_KEYS.forEach(k=>{if(has(S[k]))next[k]=S[k];});const d=new Date();next.updated=`${ymd(d.getTime())} ${hm(d.getTime())}`;
+    try{if(!ART)throw {code:'not_granted'};let code='';try{code=localStorage.getItem(CODEKEY)||'';}catch(e){}if(ENCRYPTED&&!code)throw {code:'no_code'};let body=next;if(ENCRYPTED){try{body=await encJ(next,code);if(!body||!body.enc||!body.ct)throw 0;}catch(x){throw {code:'enc_failed'};}}
+      await ART.publish({'config.json':{content:JSON.stringify(body,null,1),contentType:'application/json'}});
+      CONF=next;SHARED_KEYS.forEach(k=>S[k]=null);save();render();toast('全員に反映しました');return true;}
+    catch(e){const c=e&&e.code;if(pc){pc.disabled=false;pc.textContent='全員に反映する';}
+      if(c==='conflict'){toast('別の更新があったので読み直します');}
+      else sheet(`<div style="text-align:center">${hakosuke(96,'bow')}</div><h2 style="margin:0 0 8px">反映できませんでした</h2><p>${c==='no_code'||c==='enc_failed'?'暗号化できなかったため、安全のため公開を中止しました。アプリを開き直して合言葉を入れ直してから、もう一度押してください。':c==='capability_disabled'?'公開リンクで開いているため、ここからは反映できません。claude.ai から社長のアカウントで開いてください。':c==='not_writer'||c==='not_granted'?'社長のアカウント（claude.ai）で開いたときだけ反映できます。':'通信エラーです。少し待ってからもう一度押してください。'}</p><p class="note">変更はこの端末に残っています。Claudeに「設定を反映して」と送っても反映できます。</p><button class="btn block" onclick="this.closest('.modal').remove()">閉じる</button>`);return false;}}
+/* ---- いまの現場（リアルタイム：ログインした端末同士だけ） ---- */
+let ROOM=null,PEERS=[],ROOMCONN=false,ROOMERR='';let CANSEND=false;
+async function chkSend(){try{const v=await ROOM.canSendToClaudeSession();const ok=['available','available_if_summoned','available_if_opened'].includes(v);if(ok!==CANSEND){CANSEND=ok;if(view==='home')render();}}catch(e){CANSEND=false;}}
+function liveState(){const d=ymd(Date.now());const cut=(x,n)=>String(x||'').slice(0,n);
+  return {app:'isshindo',dev:cut(S.devName,20),t:Date.now(),born:S.born||0,org:cut(location.origin,60),un:(S.unsent||[]).length,
+    jobs:S.jobs.slice(0,8).map(j=>({i:cut(j.item,28),c:cut(j.client,14),p:cut(j.part,24),w:j.workers.slice(0,6).map(x=>cut(x,10)),s:j.startAt,pm:j.pausedMs,ps:j.pauseStart||0,pz:(j.pz||[]).slice(-6),q:cut(j.qty,8)})),
+    att:Object.entries(S.att).filter(([n,x])=>x[d]&&x[d].in&&!x[d].out).slice(0,12).map(([n,x])=>({n:cut(n,10),a:x[d].away?1:0}))};}
+let liveT=null;function pushLive(){if(!ROOM)return;clearTimeout(liveT);liveT=setTimeout(()=>{ROOM.presence({live:liveState()}).catch(()=>{});},400);}
+
+/* ---------- 案件データ ---------- */
+let DATA={cases:[],days:{},load:{},updated:''}, dataState='loading';
+let PAPER={items:[],updated:'',date0:''};
+let BOARD={posts:[],defects:null,manuals:{},maint:[],updated:''};
+/* ---- 合言葉（データの暗号化：公開リンクでも中身を読まれないように） ---- */
+const CODEKEY='isshindo_code';let LOCKED=false;
+const b64=buf=>{const u=new Uint8Array(buf);let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s);};
+const ub64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const normCode=c=>String(c||'').toLowerCase().replace(/[\s\-ー－]/g,'');
+async function kdf(code,salt){const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(normCode(code)),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:150000,hash:'SHA-256'},k,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);}
+async function decJ(o,code){const key=await kdf(code,ub64(o.salt));const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(o.iv)},key,ub64(o.ct));return JSON.parse(new TextDecoder().decode(pt));}
+async function encJ(obj,code){const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));const key=await kdf(code,salt);
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(JSON.stringify(obj)));return {enc:1,salt:b64(salt),iv:b64(iv),ct:b64(ct)};}
+let ENCRYPTED=false;
+async function getJ(n){const r=await fetch(n,{cache:'no-store'});if(!r.ok)throw 'nf';const d=await r.json();if(!d||!d.enc)return d;ENCRYPTED=true;
+  let c='';try{c=localStorage.getItem(CODEKEY)||'';}catch(e){}if(!c)throw 'locked';try{return await decJ(d,c);}catch(e){throw 'locked';}}
+async function loadAll(){LOCKED=false;
+  await Promise.all([
+    getJ('config.json').then(d=>{CONF=d||{};confState='ok';}).catch(e=>{if(e==='locked')LOCKED=true;confState='none';}),
+    getJ('board.json').then(d=>{BOARD=Object.assign(BOARD,d);}).catch(e=>{if(e==='locked')LOCKED=true;}),
+    getJ('cases.json').then(d=>{DATA=d;dataState='ok';}).catch(e=>{if(e==='locked')LOCKED=true;dataState='ng';}),
+    getJ('paper.json').then(d=>{PAPER=d||PAPER;}).catch(()=>{})]);
+  if(CONF.resetAt&&S.resetSeen!==CONF.resetAt){   // 管理者の「試験運用の開始」：全端末の作業中・記録の控えを一度だけ消す（設定と合言葉は残す）
+    ['jobs','unsent','sentLog','doneLog','maint','photos','weights','kaizenLog','paperLog','packs'].forEach(k=>S[k]=[]);S.att={};S.cnt={};S.goalSeen='';homeHK='';S.resetSeen=CONF.resetAt;save();}
+  syncArrived();render();}
+(async()=>{await new Promise(r=>setTimeout(r,0));let u=null;try{if(window.claude&&window.claude.use){u=await window.claude.use('user');ART=await window.claude.use('artifact');}}catch(e){}
+  try{ADMIN=u?!!(await u.isOwner()):false;}catch(e){ADMIN=false;}REAL_ADMIN=ADMIN;if(role()!=='')ADMIN=false;   // 作業用・勤怠専用の端末では管理者の画面を出さない
+  try{ROOM=window.claude&&window.claude.use?await window.claude.use('room'):null;}catch(e){ROOM=null;}
+  try{if(ROOM){const rr=()=>{if(view==='live'||view==='home')render();};
+    ROOM.onPeers(ch=>{PEERS=ch.peers;rr();},e=>{ROOMERR=(e&&e.code)||'error';ROOM=null;rr();});
+    ROOM.onConnection(c=>{ROOMCONN=!!c;rr();},e=>{ROOMERR=(e&&e.code)||'error';});
+    pushLive();setInterval(pushLive,60000);chkSend();}else ROOMERR='null';}catch(e){ROOMERR='ex';ROOM=null;}
+  render();})();
+loadAll();
+const allCases=()=>DATA.cases.concat(S.extraCases.map(c=>Object.assign({extra:true,parts:[]},c)));
+const caseBy=k=>allCases().find(c=>c.key===k);
+
+/* ---------- 便利関数 ---------- */
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const hm=t=>{const d=new Date(t);return pad(d.getHours())+':'+pad(d.getMinutes());};
+const ymd=t=>{const d=new Date(t);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());};
+const md=s=>{const [y,m,d]=s.split('-');return (+m)+'/'+(+d);};
+const WD='日月火水木金土';const wd=s=>WD[new Date(s+'T00:00').getDay()];
+const hms=ms=>{ms=Math.max(0,ms);const s=Math.floor(ms/1000);return pad(Math.floor(s/3600))+':'+pad(Math.floor(s%3600/60))+':'+pad(s%60);};
+const r1=x=>Math.round(x*10)/10,r2=x=>Math.round(x*100)/100;
+const tmin=s=>{const [h,m]=s.split(':').map(Number);return h*60+m;};
+const rid=()=>ymd(Date.now()).replace(/-/g,'').slice(2)+'-'+Math.random().toString(36).slice(2,6).toUpperCase();
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2200);}
+let view='home',tick=null,ui={};
+function go(v,opt){view=v;ui=Object.assign({},opt||{});render();window.scrollTo(0,0);}
+
+/* ---------- Forms 送信 ---------- */
+function bodyText(r){return Object.keys(TOKENS).filter(k=>k!=='QQKIND'&&r[k]!==undefined&&r[k]!==''&&r[k]!==null)
+  .map(k=>`${TOKENS[k]}：${String(r[k]).replace(/\n/g,' ')}`).join('\n');}
+function formsUrl(r){
+  const f=cfg('forms'); if(!f) return '';
+  const val={QQKIND:r.QQKIND||'',QQBODY:bodyText(r)};let u=f;
+  if(f.includes('QQBODY')) Object.keys(val).forEach(k=>{u=u.split(k).join(encodeURIComponent(val[k].replace(/"/g,'”')));});
+  else Object.keys(TOKENS).sort((a,b)=>b.length-a.length).forEach(k=>{u=u.split(k).join(encodeURIComponent(String(r[k]??'').replace(/"/g,'”').replace(/\n/g,' ')));});
+  return u;
+}
+function markSent(id){const r=S.unsent.find(x=>x.QQRID===id);S.unsent=S.unsent.filter(x=>x.QQRID!==id);
+  if(r){r._sent=Date.now();S.sentLog=(S.sentLog||[]).filter(x=>x.QQRID!==id).concat(r);}pruneSent();save();}
+const gotTime=()=>{const t=BOARD.gotAt||BOARD.updated;return t?new Date(String(t).replace(' ','T')+(String(t).length<=16?':00':'')).getTime():0;};
+function syncArrived(){if(!BOARD.got)return;const got=new Set(BOARD.got);let ch=false;(S.sentLog||[]).forEach(r=>{if(!r._ok&&got.has(r.QQRID)){r._ok=Date.now();ch=true;}});if(ch){pruneSent();save();}}
+function pruneSent(){const now=Date.now();S.sentLog=(S.sentLog||[]).filter(r=>!r._ok||r._ok>now-7*86400000); // 到着確認できたものだけ7日で片付ける
+  const ok=S.sentLog.filter(r=>r._ok);if(ok.length>200){const drop=new Set(ok.slice(0,ok.length-200).map(r=>r.QQRID));S.sentLog=S.sentLog.filter(r=>!drop.has(r.QQRID));}}
+function missing(){const t=gotTime();if(!t||!BOARD.got)return [];const got=new Set(BOARD.got);return (S.sentLog||[]).filter(r=>!r._ok&&r._sent<t-10*60000&&!got.has(r.QQRID)&&r.QQKIND!=='テスト');}
+const waiting=()=>{const ms=new Set(missing().map(r=>r.QQRID));return (S.sentLog||[]).filter(r=>!r._ok&&!ms.has(r.QQRID));};
+function queue(rec){rec.QQRID=rec.QQRID||rid();rec.QQNAME=rec.QQNAME||rec.QQWORKERS||'';rec._t=Date.now();S.unsent.push(rec);save();return rec;}
+function sendSheet(rec,title){
+  const u=formsUrl(rec);
+  const hk=HK[KIND_HK[rec.QQKIND]]||HK.done;if(rec.QQKIND==='改善提案')setTimeout(()=>confetti(36),150);
+  const m=sheet(`<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span class="hk-jump" style="display:inline-block">${hakosuke(72,KIND_MOOD[rec.QQKIND]||'happy')}</span><h2 style="margin:0">${esc(title||'記録しました')}</h2></div>
+   <div class="hkb">はこっち「${esc(pick(hk))}」</div>
+   ${u?`<div class="note" style="background:#fff3e0;border-radius:10px;padding:6px 10px;margin-bottom:8px">📨 端末に記録したよ。<b>まだ送信前</b>です。</div><a class="btn fill big block" id="mSend" href="${esc(u)}" target="_blank" rel="noopener">送信する</a>
+        <p class="note">開いた画面で「送信」を押してください。送れなかった分はホームの「未送信」から送れます。</p>`
+      :`<div class="alert">送信先（Forms）がまだ設定されていません。記録はこの端末に保存し、設定後にまとめて送れます。</div>`}
+   <button class="btn block" id="mClose">閉じる</button>`);
+  const s=m.querySelector('#mSend');
+  if(s) s.addEventListener('click',()=>{markSent(rec.QQRID);setTimeout(()=>{m.remove();render();},400);});
+  m.querySelector('#mClose').onclick=()=>{m.remove();render();};
+}
+
+/* ---------- 画面の外枠 ---------- */
+function bar(t,back){return `<div class="bar">${back?`<button class="back" data-go="${back}">‹</button>`:''}<h1>${t}</h1></div>`;}
+function render(){clearInterval(tick);
+  if(LOCKED){$('#app').innerHTML=`<div class="wrap" style="padding-top:60px;text-align:center"><div class="card"><span class="hk-jump" style="display:inline-block">${hakosuke(120,'greeting')}</span>
+    <h2>スタッフ用の合言葉を入れてね</h2><p class="note">最初の1回だけです。わからないときは管理者に聞いてください。</p>
+    <form id="lkForm" action="#" autocomplete="on"><input type="text" name="username" autocomplete="username" value="一新堂 現場アプリ" readonly style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1" aria-hidden="true">
+    <input id="lkCode" name="password" type="password" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="current-password" style="text-align:center;font-size:22px;letter-spacing:3px" maxlength="40" placeholder="例：abcd-efgh-jkmn">
+    <p class="note">iPhoneで「パスワードを保存しますか？」と出たら<b>保存</b>を。次からは欄をタップ→Face IDで入ります。</p>
+    <button type="submit" class="btn fill big block" id="lkOk" style="margin-top:12px">ひらく</button></form></div></div>`;
+    const go=async()=>{const v=$('#lkCode').value.trim();if(!v)return;try{localStorage.setItem(CODEKEY,v);}catch(e){}await loadAll();if(LOCKED){try{localStorage.removeItem(CODEKEY);}catch(e){}toast('合言葉がちがうみたい');}};
+    $('#lkForm').onsubmit=e=>{e.preventDefault();go();};return;}
+  $('#app').innerHTML=V[view]();B[view]&&B[view]();
+  if(REAL_ADMIN&&!ADMIN){const bn=document.createElement('div');bn.style.cssText='position:fixed;left:10px;right:10px;bottom:10px;z-index:60;background:#3b3a34;color:#fff;border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:14px';
+    bn.innerHTML='<span style="flex:1">👀 スタッフの画面で表示中</span><button class="btn sm" id="pvBack">管理者に戻る</button>';$('#app').appendChild(bn);bn.querySelector('#pvBack').onclick=()=>{ADMIN=true;render();};}}
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){e.preventDefault();go(g.dataset.go);}});
+function sheet(html){const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="sheet">${html}</div>`;document.body.appendChild(m);
+  m.addEventListener('click',e=>{if(e.target===m)m.remove();});return m;}
+function confirmSheet(msg,ok,fn){const m=sheet(`<p style="margin-top:0">${esc(msg)}</p><button class="btn stop block" id="mOk">${esc(ok)}</button><button class="btn block" id="mNo">やめる</button>`);
+  m.querySelector('#mOk').onclick=()=>{m.remove();fn();};m.querySelector('#mNo').onclick=()=>m.remove();}
+
+/* ---------- アイコン・キャラクター ---------- */
+const IC={
+ defect:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l9 16H3z"/><path d="M12 10v4.5M12 17.3v.2"/></svg>',
+ idea:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>',
+ board:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2.5"/><path d="M8 21l4-4 4 4M7 9h10M7 12.5h6"/></svg>',
+ manual:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg>',
+ nippo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V10M9.5 2.5h5M12 2.5V6M18.5 6.5l1.2-1.2"/></svg>',
+ att:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>',
+ pack:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 8l8.5-4 8.5 4v8.5L12 20.5 3.5 16.5z"/><path d="M3.5 8L12 12l8.5-4M12 12v8.5M7.8 6l8.4 4"/></svg>',
+ maint:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6.5a4 4 0 0 0-5.2 5.2L3.8 17.2a1.6 1.6 0 0 0 2.3 2.3l5.5-5.5a4 4 0 0 0 5.2-5.2l-2.4 2.4-2.1-.6-.6-2.1z"/></svg>',
+ photo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="6.5" width="18" height="13" rx="3"/><path d="M8.5 6.5l1.5-2.5h4l1.5 2.5"/><circle cx="12" cy="13" r="3.4"/></svg>',
+ mine:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>',
+ set:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg>'
+};
+/* 梱包の指示アイコン */
+const PKIC={
+ '長辺側面を底':'<svg viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="1.8" stroke-linejoin="round"><path d="M6 42h36"/><rect x="10" y="12" width="28" height="30" fill="#bcd8e3"/><path d="M10 12l5-5h28l-5 5M38 12l5-5v30l-5 5"/><path d="M24 4v6M21 7l3-3 3 3" stroke="#d0604f"/></svg>',
+ '短辺側面を底':'<svg viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="1.8" stroke-linejoin="round"><path d="M6 42h36"/><rect x="16" y="10" width="16" height="32" fill="#bcd8e3"/><path d="M16 10l5-5h16l-5 5M32 10l5-5v32l-5 5"/></svg>',
+ '平置き':'<svg viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="1.8" stroke-linejoin="round"><path d="M4 42h40"/><rect x="6" y="30" width="32" height="12" fill="#bcd8e3"/><path d="M6 30l5-5h32l-5 5M38 30l5-5v12l-5 5"/></svg>',
+ '敷紙':'<svg viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="1.8" stroke-linejoin="round"><path d="M6 12v30h36V12"/><rect x="8" y="36" width="32" height="4" fill="#f0d3a6"/><path d="M14 30h20" stroke-dasharray="3 3"/></svg>',
+ '胴巻き':'<svg viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="1.8" stroke-linejoin="round"><rect x="8" y="12" width="32" height="26" fill="#bcd8e3"/><rect x="6" y="20" width="36" height="10" fill="#f0d3a6"/></svg>',
+ '完全梱包':'<svg viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="1.8" stroke-linejoin="round"><rect x="7" y="11" width="34" height="28" fill="#f0d3a6"/><path d="M7 11l17 14 17-14M24 25v14"/></svg>',
+ '緩衝材':'<svg viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="1.6"><rect x="6" y="10" width="36" height="30"/><circle cx="14" cy="18" r="4" fill="#dff1ee"/><circle cx="25" cy="18" r="4" fill="#dff1ee"/><circle cx="36" cy="18" r="4" fill="#dff1ee"/><circle cx="19" cy="30" r="4" fill="#dff1ee"/><circle cx="30" cy="30" r="4" fill="#dff1ee"/></svg>',
+ 'カートン':'<svg viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="1.8" stroke-linejoin="round"><path d="M6 16l18-8 18 8v22l-18 8-18-8z" fill="#f0d3a6"/><path d="M6 16l18 8 18-8M24 24v22"/></svg>',
+ '重さ':'<svg viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="1.8" stroke-linejoin="round"><path d="M14 18h20l6 24H8z" fill="#e5eefa"/><circle cx="24" cy="12" r="5"/><text x="24" y="36" font-size="10" text-anchor="middle" fill="#333" stroke="none">kg</text></svg>'
+};
+/* 旧キャラクター（SVG版）の名残。現在は上の hakosuke() が はこっち のPNGを返す */
+/* キャラクター「はこっち」（GPTデザイン。assets/ のPNGを使う。関数名は互換のため hakosuke のまま） */
+const HK_IMG={normal:'normal',happy:'happy',yay:'lid_open',lid_open:'lid_open',cheer:'cheer',think:'think',sleepy:'sleepy',sorry:'bow',bow:'bow',
+  greeting:'greeting',thanks:'thanks',idea:'idea',running:'running',gift:'gift',team:'team',stack:'stack'};
+function hakosuke(size,mood){const px=Math.max(24,Math.min(192,+size||64));const k=HK_IMG[mood]||'normal';
+  return `<img src="assets/${k}.png" alt="はこっち" width="${px}" height="${px}" style="flex:none;object-fit:contain;vertical-align:middle" draggable="false">`;}
+const HK={
+ morning:['今日も一箱ずつ、丁寧にいこう！','みんなでいい箱をつくろうね','おはようございます！今日もいい箱つくろう','おはよう！まずは出勤ボタンからね','朝の一箱目、いってみよう','おはようございます。角までピシッといこう'],
+ day:['今日もよろしくお願いします','いい調子！記録もばっちり','休憩もしっかりとってね','手元の作業、ここから記録できるよ'],
+ evening:['おつかれさまでした！','今日もありがとう。退勤ボタン忘れずに','おつかれさま。また明日も角ピシッと'],
+ sat:['土曜もおつかれさまです！'],
+ done:['今日のひと仕事、未来の一新堂につながるよ','手仕事の積み重ね、ちゃんと残したよ','この記録が次の仕事をラクにするよ','おつかれさま！いい仕事だね','記録ありがとう、助かる！','角までピシッと、ナイス！','この記録が見積もりの力になるよ','ひと区切り！水分補給してね'],
+ out:['今日も一新堂を支えてくれてありがとう','今日つくった箱が、誰かのもとに届くね','今日もありがとう！ゆっくり休んでね','おつかれさまでした。また明日！','気をつけて帰ってね'],
+ in:['おはよう！今日もよろしく','出勤ありがとう！','今日もいい箱つくろう'],
+ clean:['次に使う人も気持ちいいね','きれいな現場から、きれいな箱が生まれるね','ピカピカ！ありがとう','きれいになると気持ちいいね','みんな助かるよ、ありがとう！','はこっちも喜んでるよ'],
+ maint:['故障する前のひと手間、さすが！','機械を大切にしてくれてありがとう','機械も喜んでるよ','点検ありがとう！','いつもの点検が一番の予防だね','気づいてくれてありがとう、助かる！','機械の声を聞いてくれたね','自分から記録、かっこいい！'],
+ idea:['毎日使う人だからこそ気づけることだね','もっと働きやすい一新堂にしよう！','その気づき、みんなの助けになるかも','すてきな気づき、ありがとう！','その発想、社長に届けるね','小さな改善が大きな差になるよ','提案ありがとう！はこっち大喜び'],
+ weight:['重さ、記録したよ！'],defect:['見つけてくれてありがとう','次のいい箱につなげようね','教えてくれてありがとう。次に活かそう'],photo:['いい写真！現場の記録は宝物だよ','写真ありがとう！アップロードまでお願いね','その一枚が次の改善につながるよ','ナイスショット！','生の記録、社長も喜ぶよ']
+};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const KIND_MOOD={'作業日報':'happy','勤怠':'sleepy','メンテ':'thanks','改善提案':'lid_open','重量':'thanks','梱包':'thanks','不良':'bow'};
+const KIND_HK={'作業日報':'done','勤怠':'out','清掃':'clean','メンテ':'maint','改善提案':'idea','重量':'weight','不良':'defect'};
+let homeHK='';
+function confetti(n){const cs=['#4f9a78','#e3a86a','#d9685a','#5b97c9','#f2c94c','#9b7fd1'];for(let i=0;i<n;i++){const e=document.createElement('span');e.className='confetti';
+  e.style.left=Math.random()*100+'vw';e.style.background=cs[i%cs.length];e.style.animationDelay=(Math.random()*0.6)+'s';e.style.borderRadius=(i%3?'2px':'50%');document.body.appendChild(e);setTimeout(()=>e.remove(),3200);}}
+function stackSvg(n,goal,onlyFilled){goal=Math.max(1,goal);const rows=[];let left=goal,w=Math.max(1,Math.ceil((Math.sqrt(8*goal+1)-1)/2));while(left>0){const r=Math.min(w,left);rows.push(r);left-=r;w=Math.max(1,w-1);}
+  const B=34,G=4,W=rows[0]*(B+G);let out=`<svg class="stack" viewBox="0 0 ${W} ${rows.length*(B*0.8+G)+4}" width="100%" style="max-height:220px;max-width:${rows[0]*52}px;display:block;margin:0 auto">`;let idx=0;
+  rows.forEach((r,ri)=>{const y=(rows.length-1-ri)*(B*0.8+G)+2,x0=(W-r*(B+G))/2;for(let c=0;c<r;c++){const x=x0+c*(B+G),on=idx<n;
+    out+=on?`<g class="bx" style="animation-delay:${idx*0.09}s"><rect x="${x}" y="${y+B*0.18}" width="${B}" height="${B*0.62}" fill="#fff" stroke="#22314f" stroke-width="1.4"/><rect x="${x-1.5}" y="${y+B*0.06}" width="${B+3}" height="${B*0.2}" fill="#fff" stroke="#22314f" stroke-width="1.4"/><rect x="${x+B*0.44}" y="${y+B*0.06}" width="${B*0.12}" height="${B*0.2}" fill="#d32f2f"/><rect x="${x+B*0.6}" y="${y+B*0.66}" width="${B*0.07}" height="${B*0.07}" fill="#22314f"/><rect x="${x+B*0.69}" y="${y+B*0.66}" width="${B*0.21}" height="${B*0.07}" fill="#d32f2f"/></g>`
+      :(onlyFilled?'':`<rect x="${x}" y="${y+B*0.06}" width="${B}" height="${B*0.74}" fill="none" stroke="#cbbf9f" stroke-dasharray="3 3"/>`);idx++;}});
+  return out+'</svg>';}
+function bump(k){const m=ymd(Date.now()).slice(0,7);S.cnt=S.cnt||{};S.cnt[k]=S.cnt[k]||{};S.cnt[k][m]=(S.cnt[k][m]||0)+1;return S.cnt[k][m];}
+function mcount(k){const m=ymd(Date.now()).slice(0,7);return ((S.cnt||{})[k]||{})[m]||0;}
+function tileBadge(k){const M=BOARD.month,ym=ymd(Date.now()).slice(0,7);if(k==='maint'){const n=M&&M.ym===ym?(M.maint||0):0;return n?`<span class="badge" style="position:absolute;top:8px;right:8px">みんなで今月 ${n}回</span>`:'';}
+  const n=mcount(k);return n?`<span class="badge" style="position:absolute;top:8px;right:8px">この端末 今月${n}件</span>`:'';}
+function celebrate(kind,title,n,note,big,mood){if(big)confetti(90);const m=sheet(`<div style="text-align:center"><span class="hk-jump" style="display:inline-block">${hakosuke(120,mood||(big?'gift':kind==='photo'||kind==='maint'?'thanks':kind==='idea'?'lid_open':'happy'))}</span>
+  <h2 style="margin:6px 0">${esc(title)}</h2><div class="hkb">はこっち「${esc(pick(HK[kind]||HK.done))}」</div>
+  ${n?`<p class="note" style="font-size:15px">この端末から今月 <b style="font-size:20px;color:var(--main)">${n}</b> 回目${kind==='photo'?'の送信':''}！</p>`:''}${note?`<p class="note">${esc(note)}</p>`:''}
+  <button class="btn fill big block" id="mClose">どういたしまして</button></div>`);m.querySelector('#mClose').onclick=()=>m.remove();}
+function homeMood(){const h=new Date().getHours();return S.jobs.length?'running':S.unsent.length||missing().length?'think':h<10?'greeting':h>=17?'sleepy':'normal';}
+function homeMsg(){if(homeHK)return homeHK;const h=new Date().getHours(),wd0=new Date().getDay();
+  homeHK=S.jobs.length?`作業中が ${S.jobs.length}件 あるよ`:S.unsent.length?'まだ送ってない記録があるよ':pick(h<10?HK.morning:h<17?(wd0===6?HK.sat.concat(HK.day):HK.day):HK.evening);return homeHK;}
+function greet(){const h=new Date().getHours();return h<10?'おはようございます':h<17?'今日もよろしくお願いします':'おつかれさまでした';}
+/* 人を選ぶボタン（単数） */
+function whoChips(cur,attr){const st=cfg('staff');return st.length?`<div class="chips">${st.map(n=>`<div class="chip ${cur===n?'on':''}" ${attr}="${esc(n)}">${esc(n)}</div>`).join('')}</div>`
+  :`<p class="note">名前が未登録です。<a href="#" data-go="settings">設定</a>で登録してください。</p>`;}
+/* =====================================================================  画面 */
+const V={}, B={};
+
+/* ----- ホーム ----- */
+const ROLES={'':'すべて使う','att':'勤怠専用（入口に置く端末）','work':'作業用（出退勤を出さない）'};
+const APP_VER='11/27 13:00';   // 画面の一番下に表示（どの版で開いているか確認用）
+const role=()=>S.role!==undefined&&S.role!==null?S.role:(REAL_ADMIN?'':'work');   // スタッフの端末は、決めていなければ「作業用」
+function roleFoot(){return `<p class="note" style="margin:4px 0 0;text-align:center;font-size:11px">アプリの版：${APP_VER}</p><p class="note" style="margin-top:6px;text-align:center"><a href="#" id="roleBtn" style="color:inherit">この端末の役割：${esc(ROLES[role()]||ROLES[''])} ▸</a></p>`;}
+function roleSheet(){const m=sheet(`<h2 style="margin-top:0">この端末の役割</h2><p class="note">端末ごとに決めます。まちがって押すのを防ぐための設定です。</p>
+  ${Object.entries(ROLES).map(([k,v])=>`<button class="btn block ${(role()===k)?'fill':''}" data-role="${k}" style="margin-bottom:8px">${esc(v)}</button>`).join('')}
+  ${REAL_ADMIN?'':`<p class="note" style="margin:6px 0 4px">変えるときは合言葉を入れてください</p><input id="roleCode" type="password" autocapitalize="off" autocorrect="off" autocomplete="off" style="text-align:center" placeholder="合言葉">`}
+  <button class="btn block" id="roleNo">やめる</button>`);
+  m.querySelector('#roleNo').onclick=()=>m.remove();
+  m.querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>{if(!REAL_ADMIN){let c='';try{c=localStorage.getItem(CODEKEY)||'';}catch(e){}const v=(m.querySelector('#roleCode')||{}).value||'';
+    if(!c||normCode(v)!==normCode(c)){toast('合言葉がちがうみたい');return;}}
+    S.role=b.dataset.role;ADMIN=REAL_ADMIN&&S.role==='';save();m.remove();view='home';render();toast('この端末の役割：'+ROLES[S.role]);});}
+B.home=()=>{const rb=$('#roleBtn');if(rb)rb.onclick=e=>{e.preventDefault();roleSheet();};const ub=$('#updCases');if(ub)ub.onclick=()=>{let p;try{p=ROOM.sendToClaudeSession({label:'受注一覧から案件を更新',action:'update_cases',note:'受注一覧を読み直して現場アプリの案件を更新してください'},{deliver:'send'});}catch(e){toast('送れませんでした');return;}
+    p.then(()=>toast('Claudeに更新を頼みました。チャットを確認してください')).catch(()=>{toast('このままでは送れません。チャットで「案件を更新して」と送ってください');chkSend();});};};
+V.home=()=>{if(role()==='att')return homeAtt();return homeMain();};
+function homeAtt(){const today=ymd(Date.now());const dd=new Date();const inN=Object.values(S.att).filter(x=>x[today]&&x[today].in&&!x[today].out).length;
+ return `<div class="wrap" style="padding-top:18px">
+ <div class="hello">${hakosuke(72,homeMood())}<div class="msg"><span>${dd.getMonth()+1}月${dd.getDate()}日（${WD[dd.getDay()]}）</span><b>${greet()}</b><div class="bubble">出勤・退勤はここで押してね</div></div></div>
+ ${S.unsent.length?`<div class="alert">未送信の記録が <b>${S.unsent.length}件</b> あります。<a href="#" data-go="unsent">送る</a></div>`:''}
+ ${missing().length?`<div class="alert">送ったはずの記録が <b>${missing().length}件</b> 届いていません。<a href="#" data-go="unsent">確認する</a></div>`:''}
+ <div class="grid"><div class="tile main" data-go="att" style="min-height:150px"><span class="ico" style="background:#fdecd9;color:#e08a3c">${IC.att}</span><span>出退勤<small>${inN?`出勤中 ${inN}人・`:''}名前を押して出勤・退勤・中抜け</small></span></div></div>
+ <div class="btns" style="justify-content:center"><button class="btn sm" data-go="board">📌&nbsp;お知らせ</button>${ADMIN?`<button class="btn sm" data-go="settings">${IC.set.replace('<svg','<svg width="18" height="18"')}&nbsp;設定</button>`:''}</div>
+ ${roleFoot()}</div>`;}
+function homeMain(){const today=ymd(Date.now());const dd=new Date();const inN=Object.values(S.att).filter(x=>x[today]&&x[today].in&&!x[today].out).length;
+ const attState=inN?`出勤中 ${inN}人`:'出勤・退勤・中抜け';
+ return `<div class="wrap" style="padding-top:18px">
+ <div class="hello">${hakosuke(72,homeMood())}<div class="msg"><span>${dd.getMonth()+1}月${dd.getDate()}日（${WD[dd.getDay()]}）</span><b>${greet()}</b>
+  <div class="bubble">${esc(homeMsg())}</div></div></div>
+ ${BOARD.posts.length?`<div class="card news" data-go="board" style="cursor:pointer;padding:12px 14px"><div class="note">📌 お知らせ ${md(BOARD.posts[0].d)}${S.seenPost!==BOARD.posts[0].d+BOARD.posts[0].title?'<span class="new">NEW</span>':''}</div><b style="font-size:17px">${esc(BOARD.posts[0].title)}</b>${BOARD.posts[0].body?`<div class="note" style="margin-top:2px">${esc(String(BOARD.posts[0].body).slice(0,40))}${String(BOARD.posts[0].body).length>40?'…':''}</div>`:''}</div>`:''}
+ ${S.unsent.length?`<div class="alert">未送信の記録が <b>${S.unsent.length}件</b> あります。<a href="#" data-go="unsent">送る</a></div>`:''}
+ ${missing().length?`<div class="alert">送ったはずの記録が <b>${missing().length}件</b> 届いていません。<a href="#" data-go="unsent">確認する</a></div>`:''}
+ <div class="grid">
+  <div class="tile main" data-go="nippo"><span class="ico">${IC.nippo}</span><span>作業日報<small>${(DATA.days[ymd(Date.now())]||[]).length?`今日の予定 ${new Set((DATA.days[ymd(Date.now())]||[]).map(i=>i.key)).size}件・タップしてスタート`:'予定から案件を選んでスタート'}</small>${S.jobs.length?`<span class="badge">作業中 ${S.jobs.length}件</span>`:''}</span></div>
+  ${role()==='work'?'':`<div class="tile wide" data-go="att"><span class="ico" style="background:#fdecd9;color:#e08a3c">${IC.att}</span><span>出退勤<small>${attState}</small></span></div>`}
+  <div class="tile wide" data-go="team" style="border-color:#bfe0cf;background:#f3faf5"><span class="ico" style="background:#e2f2e8;color:var(--main)">🌱</span><span>今月のみんなの積み重ね<small>${BOARD.month&&BOARD.month.ym===ymd(Date.now()).slice(0,7)?`作業記録 ${BOARD.month.work}件・提案 ${BOARD.month.idea}件・実現  ${(cfg('kaizenDone')||[]).filter(x=>(x.d||'').startsWith(ymd(Date.now()).slice(0,7))).length}件`:'みんなの行動が、いい現場をつくる'}</small></span></div>
+  <div class="tile" data-go="pack"><span class="ico" style="background:#f6e7d3;color:#b98a52">${IC.pack}</span>梱包・重量<small>入り数・配置図</small></div>
+  <div class="tile" data-go="paper"><span class="ico" style="background:#efe9dc;color:#8a6d3b">📄</span>紙の在庫<small>入庫・出庫・探す</small></div>
+  <div class="tile" data-go="maint"><span class="ico" style="background:#e5eefa;color:#5b8fc7">${IC.maint}</span>${tileBadge('maint')}機械メンテ<small>点検・修理・機械の清掃</small></div>
+  <div class="tile" data-go="photo"><span class="ico" style="background:#f7e4ec;color:#cc6f93">${IC.photo}</span>${tileBadge('photo')}写真を送る<small>試作・梱包・不良</small></div>
+  ${cfg('defectUrl')?`<a class="tile" href="${esc(cfg('defectUrl'))}" target="_blank" rel="noopener" style="text-decoration:none">`:`<div class="tile dim" data-go="defect"><span class="wip">🚧 工事中</span>`}<span class="ico" style="background:#fbe3df;color:#d0604f">${IC.defect}</span>不良<small>${cfg('defectUrl')?'不良アプリを開く':'報告・集計'}</small>${cfg('defectUrl')?'</a>':'</div>'}
+  <div class="tile" data-go="kaizen">${kaizenBadge()}<span class="ico" style="background:#fdf3cf;color:#c99a14">${IC.idea}</span>改善提案<small>気づきを送る</small></div>
+  <div class="tile dim" data-go="manual"><span class="wip">🚧 工事中</span><span class="ico" style="background:#e5eefa;color:#5b8fc7">${IC.manual}</span>マニュアル<small>機械の使い方</small></div>
+ </div>
+ ${(ADMIN&&cfg('liveOn'))?`<button class="btn fill block" data-go="live" style="margin-bottom:10px">📡 いまの現場${liveJobs().length?`（作業中 ${liveJobs().length}件）`:''}</button>`:''}
+ <div class="btns" style="justify-content:center"><button class="btn sm" data-go="mine">${IC.mine.replace('<svg','<svg width="18" height="18"')}&nbsp;記録を見る</button><button class="btn sm" data-go="board">📌&nbsp;お知らせ</button>${ADMIN?`<button class="btn sm" data-go="settings">${IC.set.replace('<svg','<svg width="18" height="18"')}&nbsp;設定</button>`:''}</div>
+ ${ADMIN&&ROOM&&CANSEND?`<button class="btn block" id="updCases" style="margin-top:12px">🔄 受注一覧から今すぐ更新</button>`:''}<p class="note" style="margin-top:16px">案件データ：${dataState==='ok'?`受注一覧 ${esc(DATA.updated)} 時点（${DATA.cases.length}件）`:dataState==='loading'?'読み込み中…':'読み込めませんでした（電波を確認）'}</p>${roleFoot()}</div>`;}
+
+/* ----- 作業日報 ----- */
+const GROUPS=['前加工','貼り','セット','検品・梱包','段ボール'];
+function grpOf(part,work,grp){if(grp==='段ボール'||/段ボ/.test(part||''))return '段ボール';if(part==='材料'||work==='前加工'||cfg('preProcs').includes(part))return '前加工';if(part==='セット')return 'セット';if(/検品|梱包/.test(part))return '検品・梱包';return '貼り';}
+const hnum=v=>/^[\d.]+$/.test(v||'')?+v:0;
+function casePlan(c,plan){const g={},hp={};(c.parts||[]).forEach(p=>{const G=grpOf(p.part,p.work,p.group),v=plan[p.part];if(v){g[G]=g[G]&&g[G]!==v?(/^[\d.]+$/.test(g[G])&&/^[\d.]+$/.test(v)?g[G]+'+'+v:(/^[\d.]+$/.test(g[G])?g[G]:/^[\d.]+$/.test(v)?v:g[G])):v;}if(G==='貼り'&&!['材料'].includes(p.part))hp[p.part]=v||'';});return {g,hp};}
+const showPlan=v=>v?`<small>${esc(v)}${/^[\d.]+$/.test(v)?'h':''}</small>`:'';
+function nearCases(){const d=dayList()[0];return [...new Set((DATA.days[d]||[]).map(i=>i.key))].map(caseBy).filter(Boolean).slice(0,10);}
+function dayList(){const t=ymd(Date.now());const ds=Object.keys(DATA.days).filter(d=>d>=t).sort();return ds;}
+V.nippo=()=>{
+  const now=Date.now(), today=ymd(now);
+  const days=dayList(); if(!ui.day) ui.day=days.includes(today)?today:(days[0]||today);
+  if(!ui.mode) ui.mode='day'; if(!ui.w) ui.w=[];
+  // 表示する案件
+  let list=[];
+  if(ui.mode==='day'){const items=DATA.days[ui.day]||[];const keys=[...new Set(items.map(i=>i.key))];
+    list=keys.map(k=>({c:caseBy(k),plan:Object.fromEntries(items.filter(i=>i.key===k).map(i=>[i.part,i.plan]))})).filter(x=>x.c);}
+  else if(ui.mode==='all'){list=allCases().map(c=>({c,plan:{}}));}
+  const st=cfg('staff');
+  if(!ui.sel)ui.sel={};const sel=ui.sel;
+  const jobs=S.jobs.map(j=>{const pl=j.plan?`予定 ${esc(j.plan)}${/^[\d.]+$/.test(j.plan)?'h':''}・`:'';return `<div class="card job">
+   <div class="ttl">${esc(j.item||j.caseKey||'—')} ／ ${esc(j.part)}</div>
+   <div class="note">${esc(j.client||'')}</div>
+   <div class="st ${j.pauseStart?'p':''}">${j.pauseStart?'中断中':'作業中'}・${esc(curW(j).join('・'))}（${curW(j).length}人）${(j.wlog||[]).length?'<small style="color:var(--sub)">（途中で入れ替えあり）</small>':''}</div>
+   <div class="timer" data-tm="${j.id}">${hms(work(j,now))}</div>${paceHtml(j,now)}
+   <div class="note" data-pz="${j.id}" style="color:var(--ink);font-weight:600">${pl}開始 ${hm(j.startAt)}・中断 ${hms(paused(j,now))}</div>
+   ${jobMeta(j)?`<div class="qnow">${jobMeta(j)}</div>`:''}
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0"><button class="btn sm" data-swap="${j.id}">👥 人の入れ替え</button><button class="btn sm" data-mid="${j.id}">⏪ 途中から記録・開始を直す</button>${j.caseKey!=='（案件以外）'?`<button class="btn sm" data-edit="${j.id}">✏️ 工程を直す</button>`:''}</div>
+   ${j.pre?`<div class="note" style="color:var(--ink)">開始前に ${j.pre}個 済み（今日の目標から引いています）</div>`:''}
+   <div class="btns">${j.pauseStart?`<button class="btn fill" data-resume="${j.id}">再開</button>`:`<button class="btn warn" data-pause="${j.id}">中断</button>`}
+    <button class="btn" data-finish="${j.id}">完了</button><button class="btn sm" data-cancel="${j.id}" style="margin-left:auto;border-color:#bbb;color:#888">取消</button></div></div>`;}).join('');
+  return bar('作業日報','home')+`<div class="wrap">${jobs}
+  <div class="card"><h2>新しい作業</h2>
+   <div class="seg"><div class="${ui.mode==='day'?'on':''}" data-mode="day">予定から</div><div class="${ui.mode==='all'?'on':''}" data-mode="all">全案件</div><div class="${ui.mode==='other'?'on':''}" data-mode="other">案件以外</div></div>
+   ${ui.mode==='day'?`<div class="pchips" style="margin-bottom:12px">${days.slice(0,6).map(d=>`<div class="pchip ${ui.day===d?'on':''}" data-day="${d}">${d===today?'今日':md(d)}<small>${wd(d)}</small></div>`).join('')||'<span class="note">予定のある日がありません</span>'}</div>`:''}
+   ${ui.mode==='other'?`<div class="chips">${OTHER_WORK.map(w=>`<div class="chip ${sel.part===w&&sel.key==='__other'?'on':''}" data-other="${esc(w)}">${esc(w)}</div>`).join('')}</div>`
+   :(dataState!=='ok'&&!S.extraCases.length?`<p class="note">案件データを読み込めていません。</p>`:list.length?list.map(({c,plan})=>{
+      const {g,hp}=casePlan(c,plan);const on=sel.key===c.key;
+      const hparts=[...new Set(Object.keys(hp).concat(cfg('hariParts')))];
+      return `<div class="case ${on?'on':''}"><div class="cl">${esc(c.client)}${c.due?`・納期 ${md(c.due)}`:''}</div>
+       <div class="it">${esc(c.item||'（品名なし）')}</div><div class="meta">${c.qty?esc(c.qty)+'個':''}${c.split?'・分納'+esc(c.split):''}${c.form?'・'+esc(c.form):''}</div>
+       <div class="pchips">${GROUPS.filter(G=>G!=='段ボール'||ui.mode==='all'||g[G]||(c.parts||[]).some(p=>grpOf(p.part,p.work,p.group)==='段ボール')||(on&&sel.grp===G)).map(G=>`<div class="pchip ${g[G]?'today':''} ${on&&sel.grp===G?'on':''}" data-key="${esc(c.key)}" data-grp="${G}">${G}${showPlan(g[G])}</div>`).join('')}</div>
+       ${on&&sel.grp==='前加工'?`<div class="note" style="margin:10px 0 6px">前加工の作業</div><div class="chips">${cfg('preProcs').map(x=>`<div class="chip ${sel.sub===x?'on':''}" data-sub="${esc(x)}">${esc(x)}</div>`).join('')}</div>`:''}
+       ${on&&sel.grp==='貼り'?`<div class="note" style="margin:10px 0 6px">貼る部品（続けてやる分は全部選ぶ）</div><div class="chips">${hparts.map(x=>`<div class="chip ${(sel.subs||[]).includes(x)?'on':''}" data-sub="${esc(x)}">${esc(x)}${showPlan(hp[x])}</div>`).join('')}</div>
+        <div class="note" style="margin:10px 0 6px">貼り方</div><div class="chips">${cfg('hariMethods').map(x=>`<div class="chip ${sel.meth===x?'on':''}" data-meth="${esc(x)}">${esc(x)}</div>`).join('')}</div>`:''}
+       </div>`;}).join('')
+      :`<p class="note">この日の予定はありません。</p>`)}
+   <p class="note">工程をタップ →（前加工・貼りは作業を選ぶ）→ 下に開始ボタンが出ます。緑の枠は受注一覧に予定がある工程です。</p></div>
+  ${(()=>{const L=(S.doneLog||[]).filter(x=>x.d===ymd(Date.now()));return L.length?`<details class="card"><summary style="font-weight:700">今日この端末で完了した作業（${L.length}件）</summary>${L.slice().reverse().map(x=>`<div class="li"><div class="t">${esc(x.item)} ／ ${esc(x.part)}<div class="note">${esc(x.s)}〜${esc(x.e)}・${esc(x.m)}分・${esc(x.who)}${x.q?'・'+esc(x.q)+'個':''}</div>${x.job?`<button class="btn sm" data-undo="${esc(x.rid)}" style="margin-top:4px">↩ まちがえた → 作業中に戻す</button>`:''}</div></div>`).join('')}<p class="note">完了を押す作業をまちがえたときは「作業中に戻す」。送った記録は取り消しとして扱われます。</p></details>`:'';})()}
+  ${sel.part?`<div style="height:340px"></div><div class="dock"><div class="in">
+   <div class="sel">選択中：<b>${esc(sel.key==='__other'?'案件以外':(caseBy(sel.key)||{}).item||'')}</b> ／ <b>${esc(sel.part)}</b> <a href="#" id="unsel" style="margin-left:6px">やめる</a></div>
+   <div class="chips c4">${st.map(n=>`<div class="person ${ui.w.includes(n)?'on':''}" data-w="${esc(n)}" style="padding:9px 8px;font-size:15px"><span class="box">${ui.w.includes(n)?'✓':''}</span>${esc(n)}${S.jobs.some(j=>j.workers.includes(n))?'<small style="display:block;color:var(--warn);font-size:11px">作業中</small>':''}</div>`).join('')}</div>
+   <button class="btn fill big block" id="start" ${ui.w.length?'':'disabled'}>${ui.w.length?`作業を開始（${ui.w.length}人）`:'作業者を選んでください'}</button>
+   <button class="btn block" id="midStart" style="margin-top:6px" ${ui.w.length?'':'disabled'}>⏩ 途中から作業開始</button>
+   <button class="btn sm block" id="late" style="margin-top:6px" ${ui.w.length?'':'disabled'}>終わった作業をあとから入力</button></div></div>`:''}</div>`;};
+function unionLen(ints,s0,e0){const a=ints.map(([x,y])=>[Math.max(s0,x),Math.min(e0,y)]).filter(([x,y])=>y>x).sort((p,q)=>p[0]-q[0]);
+  let t=0,cs=null,ce=null;for(const [x,y] of a){if(cs===null){cs=x;ce=y;}else if(x<=ce){ce=Math.max(ce,y);}else{t+=ce-cs;cs=x;ce=y;}}if(cs!==null)t+=ce-cs;return t;}
+function brkInts(s0,e0){const out=[];for(let d=new Date(ymd(s0)+'T00:00:00').getTime();d<=e0;d+=86400000){const ds=ymd(d);
+  (cfg('breaks')||[]).forEach(b=>{const [x,y]=String(b).split('-');if(!x||!y)return;const w1=new Date(ds+'T'+x+':00').getTime(),w2=new Date(ds+'T'+y+':00').getTime();if(w2>w1)out.push([w1,w2]);});}return out;}
+const pzInts=(j,n)=>(j.pz||[]).concat(j.pauseStart?[[j.pauseStart,n]]:[]);
+const extraPause=j=>Math.max(0,(j.pausedMs||0)-(j.pz||[]).reduce((a,p)=>a+Math.max(0,p[1]-p[0]),0)); // 区間の記録がない中断（あとから入力など）＝休憩以外の中断
+const paused=(j,n)=>unionLen(pzInts(j,n),j.startAt,n)+extraPause(j);
+const brk=(j,n)=>unionLen(brkInts(j.startAt,n).concat(pzInts(j,n)),j.startAt,n)-unionLen(pzInts(j,n),j.startAt,n); // 休憩として除いた分（中断と重なる分は除く）
+const work=(j,n)=>n<=j.startAt?0:Math.max(0,(n-j.startAt)-unionLen(brkInts(j.startAt,n).concat(pzInts(j,n)),j.startAt,n)-extraPause(j));
+B.nippo=()=>{
+  tick=setInterval(()=>{const n=Date.now();S.jobs.forEach(j=>{const t=$(`[data-tm="${j.id}"]`);if(t)t.textContent=hms(work(j,n));const P=paceNow(j,n);if(P){const a=$(`[data-ps="${j.id}"]`);if(a)a.textContent=P.so;const b=$(`[data-pl="${j.id}"]`);if(b)b.textContent=P.left>0?P.left:0;}});},1000);
+  $$('[data-mode]').forEach(el=>el.onclick=()=>{ui.mode=el.dataset.mode;ui.sel={};render();});
+  $$('[data-day]').forEach(el=>el.onclick=()=>{ui.day=el.dataset.day;ui.sel={};render();});
+  const keep=()=>{const y=scrollY;render();scrollTo(0,y);};
+  const fin=()=>{const s=ui.sel;const subs=s.subs||[];s.part=s.grp==='前加工'?(s.sub?'前加工｜'+s.sub:''):s.grp==='貼り'?(subs.length&&s.meth?`貼り｜${subs.join('・')}｜${s.meth}`:''):s.grp;
+    const c=caseBy(s.key);const plan=ui.mode==='day'?Object.fromEntries((DATA.days[ui.day]||[]).filter(i=>i.key===s.key).map(i=>[i.part,i.plan])):{};
+    const {g,hp}=c?casePlan(c,plan):{g:{},hp:{}};if(s.grp==='貼り'){const v=subs.map(x=>hp[x]).filter(Boolean);const t=v.reduce((a,x)=>a+hnum(x),0);s.plan=t?String(r2(t)):(v.join('+')||'');}else s.plan=g[s.grp]||'';s.nparts=s.grp==='貼り'?subs.length:1;};
+  $$('[data-grp]').forEach(el=>el.onclick=()=>{const k=el.dataset.key,G=el.dataset.grp;ui.sel=(ui.sel.key===k&&ui.sel.grp===G)?{}:{key:k,grp:G,meth:G==='貼り'?S.lastMethod:''};if(ui.sel.grp)fin();keep();});
+  $$('[data-sub]').forEach(el=>el.onclick=()=>{const v=el.dataset.sub;if(ui.sel.grp==='貼り'){const a=ui.sel.subs||[];ui.sel.subs=a.includes(v)?a.filter(x=>x!==v):a.concat(v);}else ui.sel.sub=v;fin();keep();});
+  $$('[data-meth]').forEach(el=>el.onclick=()=>{ui.sel.meth=el.dataset.meth;S.lastMethod=el.dataset.meth;save();fin();keep();});
+  $$('[data-other]').forEach(el=>el.onclick=()=>{ui.sel={key:'__other',part:el.dataset.other};render();});
+  $$('[data-w]').forEach(el=>el.onclick=()=>{const n=el.dataset.w;ui.w=ui.w.includes(n)?ui.w.filter(x=>x!==n):ui.w.concat(n);const y=scrollY;render();scrollTo(0,y);});
+  const un=$('#unsel');if(un)un.onclick=e=>{e.preventDefault();ui.sel={};render();};
+  const ms=$('#midStart'); if(ms) ms.onclick=()=>{if(!ui.w.length){toast('作業者を選んでください');return;}
+    const m=sheet(`<h2 style="margin:0 0 6px">途中から作業開始</h2><p class="note" style="margin:0 0 8px">すでに進んでいる作業を、今から記録します。<b>今日すでにできている数</b>を入れてください（だいたいでOK）。</p>
+     <input id="msN" type="number" inputmode="numeric" min="0" style="font-size:28px;text-align:center" placeholder="例：100">
+     <p class="note">今日の目標からこの数を引いて、残りでペースを出します。完了のときは、この数も含めた合計を入れてね。</p>
+     <button class="btn fill big block" id="msOk" style="margin-top:8px">この数から開始</button><button class="btn block" id="msNo">やめる</button>`);
+    const inp=m.querySelector('#msN');setTimeout(()=>inp.focus(),50);m.querySelector('#msNo').onclick=()=>m.remove();
+    m.querySelector('#msOk').onclick=()=>{const v=parseInt(inp.value,10);if(!(v>=0)){toast('できている数を入れてください（だいたいでOK）');return;}m.remove();ui.preStart=v;$('#start').click();};};
+  const st=$('#start'); if(st) st.onclick=()=>{
+    if(!ui.w.length){toast('作業者を選んでください');return;}
+    const busy=ui.w.filter(n=>S.jobs.some(j=>j.workers.includes(n)));
+    if(busy.length&&!st.dataset.ok){confirmSheet(`${busy.join('・')}さんは別の作業中です。\n前の作業を「完了」か「中断」にしないと、時間が二重に数えられます。このまま始めますか？`,'このまま始める',()=>{st.dataset.ok='1';st.click();});return;}
+    delete st.dataset.ok;
+    const s=ui.sel, c=s.key==='__other'?null:caseBy(s.key);
+    const plan=s.plan||'';
+    S.jobs.unshift({id:'J'+Date.now(),caseKey:c?c.key:'（案件以外）',client:c?c.client:'',item:c?c.item:'（案件以外）',part:s.part,plan,nparts:s.nparts||1,
+      qty:c?c.qty||'':'',split:c?c.split||'':'',form:c?c.form||'':'',due:c?c.due||'':'',
+      workers:cfg('staff').filter(n=>ui.w.includes(n)),startAt:Date.now(),pausedMs:0,pauseStart:null,good:'',pre:ui.preStart||0});
+    const pv=ui.preStart;ui.preStart=0;ui.sel={};ui.w=[];save();render();window.scrollTo(0,0);toast(pv?`${pv}個できている状態から開始しました`:'開始しました');};
+
+  $$('[data-pause]').forEach(el=>el.onclick=()=>{const j=S.jobs.find(x=>x.id===el.dataset.pause);let r='';
+    const m=sheet(`<h2 style="margin:0 0 6px">中断する</h2><p class="note" style="margin:0 0 8px">理由をえらんでね（わかる範囲で）</p><div class="chips c2">${PAUSE_R.map(x=>`<div class="chip" data-pr="${esc(x)}">${esc(x)}</div>`).join('')}</div>
+     <button class="btn warn big block" id="pzLater" style="margin-top:12px">あとで再開する</button><button class="btn block" id="pzEnd">ここで終了する（今日はこの作業に戻らない）</button><button class="btn sm block" id="pzNo" style="margin-top:6px">やめる</button>`);
+    m.querySelectorAll('[data-pr]').forEach(c=>c.onclick=()=>{m.querySelectorAll('[data-pr]').forEach(x=>x.classList.remove('on'));c.classList.add('on');r=c.dataset.pr;});
+    m.querySelector('#pzNo').onclick=()=>m.remove();
+    m.querySelector('#pzLater').onclick=()=>{j.pauseStart=Date.now();j.pauseReason=r;save();m.remove();render();};
+    m.querySelector('#pzEnd').onclick=()=>{m.remove();j.stopReason=r||'理由なし';j.partial=true;save();finishJob(j);};});
+  $$('[data-undo]').forEach(el=>el.onclick=()=>{const x=(S.doneLog||[]).find(y=>y.rid===el.dataset.undo);if(!x)return;
+    confirmSheet(`「${x.item} ／ ${x.part}」の完了を取り消して、作業中に戻しますか？\n（終わった時刻は消え、続きから計り直します）`,'作業中に戻す',()=>{
+      const wasUnsent=S.unsent.some(r=>r.QQRID===x.rid);S.unsent=S.unsent.filter(r=>r.QQRID!==x.rid);S.sentLog=(S.sentLog||[]).filter(r=>r.QQRID!==x.rid);
+      S.doneLog=S.doneLog.filter(y=>y.rid!==x.rid);delete x.job.partial;delete x.job.stopReason;S.jobs.unshift(x.job);save();render();
+      if(!wasUnsent){const rec=queue({QQKIND:'取消',QQDATE:ymd(Date.now()),QQCASE:x.key||'',QQPART:x.part,QQWORKERS:x.who||'',QQMEMO:'取消 '+x.rid});save();render();sendSheet(rec,'作業中に戻しました（取り消しを送ってね）');}
+      else toast('作業中に戻しました');});});
+  $$('[data-edit]').forEach(el=>el.onclick=()=>{const j=S.jobs.find(x=>x.id===el.dataset.edit);const c=caseBy(j.caseKey);const d=ymd(j.startAt);
+    const plan=Object.fromEntries((DATA.days[d]||[]).filter(i=>i.key===j.caseKey).map(i=>[i.part,i.plan]));const {g,hp}=c?casePlan(c,plan):{g:{},hp:{}};
+    const G0=j.part.split('｜');let e={grp:G0[0],sub:G0[0]==='前加工'?G0[1]:'',subs:G0[0]==='貼り'?(G0[1]||'').split('・').filter(Boolean):[],meth:G0[0]==='貼り'?G0[2]:''};
+    const hparts=[...new Set(Object.keys(hp).concat(cfg('hariParts')))];
+    const m=sheet('<div id="edBody"></div>');
+    const draw=()=>{m.querySelector('#edBody').innerHTML=`<h2 style="margin:0 0 4px">工程を直す</h2><p class="note" style="margin:0 0 8px">${esc(j.item)}　開始時刻と作業者はそのままです。</p>
+      <div class="pchips">${GROUPS.map(G=>`<div class="pchip ${e.grp===G?'on':''}" data-eg="${G}">${G}</div>`).join('')}</div>
+      ${e.grp==='前加工'?`<div class="note" style="margin:10px 0 6px">前加工の作業</div><div class="chips">${cfg('preProcs').map(x=>`<div class="chip ${e.sub===x?'on':''}" data-es="${esc(x)}">${esc(x)}</div>`).join('')}</div>`:''}
+      ${e.grp==='貼り'?`<div class="note" style="margin:10px 0 6px">貼る部品</div><div class="chips">${hparts.map(x=>`<div class="chip ${e.subs.includes(x)?'on':''}" data-ep="${esc(x)}">${esc(x)}</div>`).join('')}</div>
+        <div class="note" style="margin:10px 0 6px">貼り方</div><div class="chips">${cfg('hariMethods').map(x=>`<div class="chip ${e.meth===x?'on':''}" data-em="${esc(x)}">${esc(x)}</div>`).join('')}</div>`:''}
+      <button class="btn fill big block" id="edOk" style="margin-top:12px">この内容に直す</button><button class="btn block" id="edNo">やめる</button>`;
+      m.querySelectorAll('[data-eg]').forEach(x=>x.onclick=()=>{e.grp=x.dataset.eg;draw();});
+      m.querySelectorAll('[data-es]').forEach(x=>x.onclick=()=>{e.sub=x.dataset.es;draw();});
+      m.querySelectorAll('[data-ep]').forEach(x=>x.onclick=()=>{const v=x.dataset.ep;e.subs=e.subs.includes(v)?e.subs.filter(y=>y!==v):e.subs.concat(v);draw();});
+      m.querySelectorAll('[data-em]').forEach(x=>x.onclick=()=>{e.meth=x.dataset.em;draw();});
+      m.querySelector('#edNo').onclick=()=>m.remove();
+      m.querySelector('#edOk').onclick=()=>{let part='',pl='';
+        if(e.grp==='前加工'){if(!e.sub){toast('前加工の作業を選んでね');return;}part='前加工｜'+e.sub;pl=g['前加工']||'';}
+        else if(e.grp==='貼り'){if(!e.subs.length||!e.meth){toast('部品と貼り方を選んでね');return;}part=`貼り｜${e.subs.join('・')}｜${e.meth}`;const v=e.subs.map(x=>hp[x]).filter(Boolean);const t=v.reduce((a,x)=>a+hnum(x),0);pl=t?String(r2(t)):(v.join('+')||'');}
+        else{part=e.grp;pl=g[e.grp]||'';}
+        const was=j.part;j.part=part;j.plan=pl;j.nparts=e.grp==='貼り'?e.subs.length:1;delete j.tgt;j.fixPart=(j.fixPart?j.fixPart+'→':'')+was;save();m.remove();render();toast('工程を直しました');};};
+    draw();});
+  $$('[data-swap]').forEach(el=>el.onclick=()=>{const j=S.jobs.find(x=>x.id===el.dataset.swap);let w=[...curW(j)];
+    const m=sheet(`<h2 style="margin:0 0 6px">人の入れ替え</h2><p class="note" style="margin:0 0 8px">今、この作業をしている人にチェック。帰った人は外し、来た人は足してください。この時刻から人数が変わったとして、人時を正しく計算します。</p><div class="chips c4">${cfg('staff').map(n=>`<div class="person ${w.includes(n)?'on':''}" data-sw="${esc(n)}" style="padding:9px 8px;font-size:15px"><span class="box">${w.includes(n)?'✓':''}</span>${esc(n)}</div>`).join('')}</div>
+     <label class="f">変わった時刻</label><input id="swT" type="time" value="${hm(Date.now())}"><button class="btn fill big block" id="swOk" style="margin-top:10px">変更する</button><button class="btn block" id="swNo">やめる</button>`);
+    m.querySelectorAll('[data-sw]').forEach(x=>x.onclick=()=>{const n=x.dataset.sw;w=w.includes(n)?w.filter(y=>y!==n):w.concat(n);x.classList.toggle('on');x.querySelector('.box').textContent=w.includes(n)?'✓':'';});
+    m.querySelector('#swNo').onclick=()=>m.remove();
+    m.querySelector('#swOk').onclick=()=>{if(!w.length){toast('だれもいなくなるときは「中断」か「完了」を押してね');return;}const tv=m.querySelector('#swT').value;let t=Date.now();if(tv){const x=new Date(ymd(Date.now())+'T'+tv+':00').getTime();if(x>j.startAt&&x<=Date.now())t=x;}
+      if(!j.workers0)j.workers0=[...j.workers];j.wlog=(j.wlog||[]).concat({t,w:cfg('staff').filter(n=>w.includes(n))});j.workers=cfg('staff').filter(n=>j.workers.includes(n)||w.includes(n));save();m.remove();render();toast(`${hm(t)}から ${w.length}人で計算します`);};});
+  $$('[data-mid]').forEach(el=>el.onclick=()=>{const j=S.jobs.find(x=>x.id===el.dataset.mid);let mode='time';
+    const m=sheet(`<h2 style="margin:0 0 6px">途中から記録・開始を直す</h2><p class="note" style="margin:0 0 8px">開始を押し忘れて途中から記録したときに使います。わかる方だけでOK。</p>
+     <div class="seg"><div class="on" data-md="time">始めた時刻がわかる</div><div data-md="count">できている数ならわかる</div></div>
+     <div id="mdT"><label class="f">本当に始めた時刻</label><input id="mdTime" type="time" value="${hm(j.startAt)}"><p class="note">この時刻からの作業時間で記録します。</p></div>
+     <div id="mdC" style="display:none"><label class="f">記録を始める前にできていた数</label><input id="mdN" type="number" inputmode="numeric" min="0" value="${j.pre||''}" style="font-size:24px;text-align:center"><p class="note">今日の目標からこの数を引いて、残りでペースを出します。完了のときは、この数も含めた合計を入れてね。</p></div>
+     <button class="btn fill big block" id="mdOk" style="margin-top:10px">直す</button><button class="btn block" id="mdNo">やめる</button>`);
+    m.querySelectorAll('[data-md]').forEach(x=>x.onclick=()=>{mode=x.dataset.md;m.querySelectorAll('[data-md]').forEach(y=>y.classList.toggle('on',y===x));m.querySelector('#mdT').style.display=mode==='time'?'':'none';m.querySelector('#mdC').style.display=mode==='count'?'':'none';});
+    m.querySelector('#mdNo').onclick=()=>m.remove();
+    m.querySelector('#mdOk').onclick=()=>{if(mode==='time'){const tv=m.querySelector('#mdTime').value;if(!tv){toast('時刻を入れてください');return;}const x=new Date(ymd(j.startAt)+'T'+tv+':00').getTime();if(x>Date.now()){toast('今より後の時刻です');return;}
+        if((j.wlog||[]).some(w=>w.t<x)){toast('人の入れ替えより前の時刻にしてください');return;}j.startAt=x;j.fixStart=true;}
+      else{const v=parseInt(m.querySelector('#mdN').value,10);j.pre=v>0?v:0;}save();m.remove();render();toast('直しました');};});
+  $$('[data-tgt]').forEach(el=>el.onclick=e=>{e.preventDefault();const j=S.jobs.find(x=>x.id===el.dataset.tgt);const P=pace(j);if(!P)return;
+    const m=sheet(`<h2 style="margin:0 0 6px">今日の目標個数</h2><p class="note" style="margin:0 0 8px">受注一覧の予定から計算すると <b>${P.auto}個</b> です。今日やる数が違うときだけ直してください。</p><input id="tgN" type="number" inputmode="numeric" min="1" value="${P.total}" style="font-size:26px;text-align:center"><button class="btn fill big block" id="tgOk" style="margin-top:10px">この数にする</button><button class="btn block" id="tgAuto">予定どおり（${P.auto}個）に戻す</button><button class="btn sm block" id="tgNo">やめる</button>`);
+    m.querySelector('#tgNo').onclick=()=>m.remove();m.querySelector('#tgAuto').onclick=()=>{delete j.tgt;save();m.remove();render();};
+    m.querySelector('#tgOk').onclick=()=>{const v=parseInt(m.querySelector('#tgN').value,10);if(!(v>0)){toast('数を入れてください');return;}j.tgt=v===P.auto?undefined:v;save();m.remove();render();};});
+  $$('[data-chk]').forEach(el=>el.onclick=()=>{const j=S.jobs.find(x=>x.id===el.dataset.chk);const P=paceNow(j,Date.now());if(!P)return;
+    const m=sheet(`<h2 style="margin:0 0 6px">今の個数</h2><p class="note" style="margin:0 0 8px">ここまでにできた数（ライン全体）。目標は今 ${P.so}個です。</p><input id="ckN" type="number" inputmode="numeric" min="0" style="font-size:26px;text-align:center" placeholder="個数"><button class="btn fill big block" id="ckOk" style="margin-top:10px">入れる</button><button class="btn block" id="ckNo">やめる</button>`);
+    const inp=m.querySelector('#ckN');setTimeout(()=>inp.focus(),50);m.querySelector('#ckNo').onclick=()=>m.remove();
+    m.querySelector('#ckOk').onclick=()=>{const v=parseInt(inp.value,10);if(!(v>=0)){toast('数を入れてください');return;}const t=Date.now();const w=work(j,t)/60000;
+      j.chk=(j.chk||[]).concat({t,n:v,w});save();m.remove();render();const r=w>0?v/w:0;
+      if(w>0.5){const ok=r>=P.rate;const mm=sheet(`<div style="text-align:center"><span class="hk-jump" style="display:inline-block">${hakosuke(100,ok?'cheer':'think')}</span><h2 style="margin:6px 0">${ok?'いいペース！':'ちょっと遅れ気味'}</h2>
+        <p style="font-size:16px">目標 毎分${r1(P.rate)}個 → 今 <b>毎分${r1(r)}個</b></p>${(()=>{const fin=r>0?w+(P.total-v)/r:0,ov=Math.round(fin-P.eff);return ov>0?`<p style="font-size:20px;font-weight:900;color:#b3261e">このままだと 約${ov}分オーバー</p>`:`<p style="font-size:20px;font-weight:900;color:#1e6b41">予定より 約${-ov}分早いペース</p>`;})()}<div class="hkb">はこっち「${ok?'この調子でいこう！':'段取りを見直すか、応援を呼ぼう'}」</div><button class="btn fill big block" id="pkOk">OK</button></div>`);mm.querySelector('#pkOk').onclick=()=>mm.remove();};};});
+  $$('[data-resume]').forEach(el=>el.onclick=()=>{const j=S.jobs.find(x=>x.id===el.dataset.resume);j.pausedMs+=Date.now()-j.pauseStart;j.pz=(j.pz||[]).concat([[j.pauseStart,Date.now()]]);j.pzr=(j.pzr||[]).concat([[j.pauseReason||'',Date.now()-j.pauseStart]]);j.pauseStart=null;j.pauseReason='';save();render();});
+  $$('[data-cancel]').forEach(el=>el.onclick=()=>confirmSheet('この作業を取り消しますか？記録は残りません。','取り消す',()=>{S.jobs=S.jobs.filter(j=>j.id!==el.dataset.cancel);save();render();}));
+  $$('[data-finish]').forEach(el=>el.onclick=()=>finishJob(S.jobs.find(j=>j.id===el.dataset.finish)));
+  $$('[data-qn]').forEach(el=>el.onclick=()=>{const j=S.jobs.find(x=>x.id===el.dataset.qn);
+    const m=sheet(`<h2 style="margin:0 0 4px">いまの数をメモ</h2><p class="note" style="margin-top:0">途中で何個できたか残せます。完了のときにこの数が入っています。</p>${qtyFields(j)}
+     <button class="btn fill big block" id="qOk">メモする</button><button class="btn block" id="qNo">やめる</button>`);
+    m.querySelector('#qNo').onclick=()=>m.remove();
+    m.querySelector('#qOk').onclick=()=>{j.q={};m.querySelectorAll('.mq').forEach(e=>{if(e.value.trim()!=='')j.q[e.id]=e.value.trim();});j.qAt=Date.now();save();m.remove();render();toast('メモしました');};});
+  const lt=$('#late');if(lt)lt.onclick=()=>{if(!ui.w.length){toast('作業者を選んでください');return;}
+    const t=ymd(Date.now());const m=sheet(`<h2 style="margin:0 0 4px">あとから入力</h2><p class="note" style="margin-top:0">完了を押し忘れた作業などを、時刻を指定して記録します。</p>
+     <label class="f">日付</label><input type="date" id="lD" value="${t}" max="${t}">
+     <div class="chips c2"><div><span class="lbl">開始</span><input type="time" id="lS"></div><div><span class="lbl">終了</span><input type="time" id="lE"></div></div>
+     <label class="f">休憩以外で中断していた時間（分・任意）</label><p class="note" style="margin:0">昼休憩は自動で引くので入れなくてOK</p><input type="number" inputmode="numeric" id="lP" value="0" min="0">
+     <button class="btn fill big block" id="lOk">次へ（数を入れる）</button><button class="btn block" id="lNo">やめる</button>`);
+    m.querySelector('#lNo').onclick=()=>m.remove();
+    m.querySelector('#lOk').onclick=()=>{const d=m.querySelector('#lD').value,a=m.querySelector('#lS').value,b=m.querySelector('#lE').value;
+      if(!d||!a||!b){toast('日付・開始・終了を入れてください');return;}
+      const st=new Date(d+'T'+a+':00').getTime(),en=new Date(d+'T'+b+':00').getTime();if(en<=st){toast('終了が開始より前です');return;}
+      const pz=(+m.querySelector('#lP').value||0)*60000;if(pz<0){toast('中断の分が正しくありません');return;}if(work({startAt:st,pausedMs:pz,pz:[]},en)<=0){toast('中断が長すぎます（作業時間が0分になります）');return;}
+      const s2=ui.sel,c=s2.key==='__other'?null:caseBy(s2.key);m.remove();
+      finishJob({id:'L'+Date.now(),caseKey:c?c.key:'（案件以外）',client:c?c.client:'',item:c?c.item:'（案件以外）',part:s2.part,plan:s2.plan||'',nparts:s2.nparts||1,
+        workers:cfg('staff').filter(n=>ui.w.includes(n)),startAt:st,pausedMs:pz,pauseStart:null,late:true},en);};};
+};
+const curW=j=>{const L=j.wlog||[];return L.length?L[L.length-1].w:j.workers;};
+/* 人の入れ替えがあるときの延べ作業分（休憩・中断を除いた作業時間 × その間の人数） */
+function personMin(j,end){const L=(j.wlog||[]).filter(x=>x.t<end);let segs=[[j.startAt,j.workers0||j.workers]].concat(L.map(x=>[x.t,x.w]));let pm=0;
+  segs.forEach((sg,i)=>{const t1=i+1<segs.length?segs[i+1][0]:end;pm+=(work(j,t1)-work(j,sg[0]))/60000*sg[1].length;});return pm;}
+/* ---- 貼りのペース目標（ライン全体。予定時間−段取り余裕：1時間以上は10分・1時間未満は5分） ---- */
+const PAUSE_R=['材料待ち','材料ミス/不良','段取り替え','機械トラブル','指示待ち','休憩/その他'];
+/* 今日の目標個数：残り個数 × 今日の予定時間 ÷ 今日以降の予定時間の合計（工程ごと）。完了済みの記録（DATA.done）を残りから引く */
+function partOfGroup(j){const c=caseBy(j.caseKey);const g=j.part.split('｜')[0];const p=c&&c.parts?c.parts.find(p=>grpOf(p.part,p.work,p.group)===g):null;return p?p.part:g;}
+function partQty(x,part){if(!(x.subs||[]).includes(part))return 0;const q=String(x.q||'');const m=q.match(new RegExp(part+'(\\d+)'));if(m)return +m[1];return /^\d+$/.test(q)&&(x.subs||[]).length<=1?+q:0;}
+function todayQty(j){const c=caseBy(j.caseKey);const q=hnum(String(j.qty||'').replace(/,/g,''));if(!q)return null;
+  const d=ymd(j.startAt),G=(j.part||'').split('｜');let parts=[];
+  if(c&&c.parts){if(G[0]==='貼り'){const subs=(G[1]||'').split('・');parts=c.parts.filter(p=>subs.includes(p.part));}
+    else parts=c.parts.filter(p=>grpOf(p.part,p.work,p.group)===G[0]);}
+  if(!parts.length)return null;let tq=0,th=0;
+  const t0=DATA.updated?new Date(DATA.updated.replace(' ','T')+':00').getTime():0;
+  const local=(S.doneLog||[]).filter(x=>x.key===j.caseKey&&x.d===d&&x.t>t0&&x.id!==j.id);   // まだ集計に入っていない、この端末の今日の完了分
+  for(const p of parts){const s=p.sched||{};const ht=hnum(s[d]);const hr=Object.keys(s).filter(x=>x>=d).reduce((a,x)=>a+hnum(s[x]),0);
+    const nums=Object.keys(s).map(x=>hnum(s[x])).filter(v=>v>0);const avg=nums.length?nums.reduce((a,v)=>a+v,0)/nums.length:0;
+    const ha=nums.reduce((a,v)=>a+v,0)+avg*Object.keys(s).filter(x=>x<d&&s[x]==='スミ').length;
+    const dm=(DATA.done||{})[j.caseKey]?.[p.part]||{};const dnB=typeof dm==='number'?dm:Object.keys(dm).filter(x=>x<d).reduce((a,x)=>a+dm[x],0);
+    const dnT=(typeof dm==='number'?0:(dm[d]||0))+local.reduce((a,x)=>a+partQty(x,p.part),0);
+    const rem=dnB>0?Math.max(0,q-dnB):(ha>0?q*hr/ha:q);   // 前日までの完了記録があれば実績から、なければ過去の予定時間ぶんは済んだとみなす
+    if(!ht)return null;tq+=Math.max(0,(hr>0?rem*ht/hr:rem)-dnT);th+=ht;}   // 今日すでに完了した分（午前の人など）は引く
+  return {qty:Math.round(tq),h:th};}
+function pace(j){if(!j.part||/^前加工/.test(j.part)||j.caseKey==='（案件以外）')return null;
+  const T=todayQty(j);const h=T?T.h:hnum(j.plan);const q=hnum(String(j.qty||'').replace(/,/g,''));if(!h||!q)return null;
+  const pm=h*60,eff=pm-(h>=1?10:5);if(eff<=0)return null;const auto=T?T.qty:q*(j.nparts||1);const total=Math.max(0,(j.tgt>0?j.tgt:auto)-(j.pre||0));if(!total)return null;return {total,eff,rate:total/eff,auto,lot:q};}
+function paceNow(j,n){const P=pace(j);if(!P)return null;const w=work(j,n)/60000;return Object.assign({w,so:Math.min(P.total,Math.round(P.rate*w)),left:Math.round(P.eff-w)},P);}
+function paceHtml(j,n){const P=paceNow(j,n);if(!P)return '';const ck=(j.chk||[]).slice(-1)[0];let ckh='';
+  if(ck&&ck.w>0.5){const r=ck.n/ck.w,need=P.total-ck.n,fin=r>0?ck.w+need/r:0,over=Math.round(fin-P.eff);
+    const sup=(()=>{const rem=P.eff-ck.w,needR=rem>0?need/rem:0;return rem>0&&j.workers.length?Math.max(1,Math.ceil(j.workers.length*needR/Math.max(r,0.01)-j.workers.length-1e-9)):0;})();
+    ckh=`<div class="note" style="margin-top:8px;text-align:center">${hm(ck.t)}の確認：${ck.n}個 → 実際 <b>毎分${r1(r)}個</b>（目標との差 ${r>=P.rate?'+':''}${r1(r-P.rate)}）</div>`+
+     (over>0?`<div style="margin-top:6px;background:#fdecea;border:2px solid #d0342c;border-radius:12px;padding:10px;text-align:center;color:#b3261e">
+        <div style="font-size:clamp(17px,5.2vw,24px);font-weight:900">⚠ 約${over}分オーバーのペース</div>
+        <div style="font-size:14px;font-weight:700;margin-top:2px">${sup?`応援 約${sup}人で間に合う目安。`:''}早めに応援を頼むか、段取りを見直そう</div></div>`
+     :`<div style="margin-top:6px;background:#e3f4ea;border:2px solid #2e8b57;border-radius:12px;padding:10px;text-align:center;color:#1e6b41">
+        <div style="font-size:clamp(17px,5.2vw,24px);font-weight:900">👍 約${Math.max(0,-over)}分早く終わるペース</div>
+        <div style="font-size:16px;font-weight:700;margin-top:2px">${-over>=10?'すごい！このやり方、みんなに共有しよう':'この調子でいこう！'}</div></div>`);}
+  const box=(lab,val,unit,attr)=>`<div style="background:#fff;border-radius:12px;padding:8px 4px;text-align:center"><div style="font-size:13px;color:var(--sub);font-weight:700">${lab}</div><div style="line-height:1.1;white-space:nowrap"><b style="font-size:clamp(26px,8.5vw,44px);color:#1f5c42;font-variant-numeric:tabular-nums;font-weight:800" ${attr||''}>${val}</b><span style="font-size:15px;font-weight:700"> ${unit}</span></div></div>`;
+  return `<div class="pace" data-pace="${j.id}" style="background:#e6f3ec;border-radius:14px;padding:10px;margin:10px 0">
+   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+    ${box('目標 毎分',r1(P.rate),'個')}
+    ${box('今の目標',P.so,'個',`data-ps="${j.id}"`)}
+    ${box('終了まで',P.left>0?P.left:0,'分',`data-pl="${j.id}"`)}</div>
+   <div class="note" style="text-align:center;margin-top:6px"><b style="color:var(--ink)">今日の目標 ${P.total}個</b>${j.tgt>0?'（手で変更）':P.total!==P.lot?`（ロット${P.lot}個のうち）`:''} <a href="#" data-tgt="${j.id}">変える</a></div>${ckh}
+   <button class="btn block" data-chk="${j.id}" style="margin-top:8px">今の個数を入れる</button></div>`;}
+function jobMeta(j){const c=caseBy(j.caseKey)||{};const qty=j.qty||c.qty,sp=j.split||c.split,fm=j.form||c.form,due=j.due||c.due;
+  return [qty?`<b>${esc(qty)}個</b>`:'',sp?'分納'+esc(sp):'',fm?esc(fm):'',due?'納期 '+md(due):''].filter(Boolean).join('・');}
+function qNowText(j){const q=j.q||{};if(!Object.keys(q).length)return '';const g=j.part.split('｜')[0];
+  if(g==='貼り'){const ps=(j.part.split('｜')[1]||'').split('・');return ps.map((p,i)=>q['mq'+i]!==undefined?(ps.length>1?p:'')+q['mq'+i]+'個':'').filter(Boolean).join('・');}
+  return (q.mq0!==undefined?q.mq0+'個':'')+(q.mBad&&q.mBad!=='0'?`（不良${q.mBad}）`:'');}
+function qtyFields(j){const g=j.part.split('｜')[0];const q=j.q||{};const num=(id,ph)=>`<input id="${id}" class="mq" type="number" inputmode="numeric" min="0" placeholder="${ph||''}" value="${esc(q[id]||'')}">`;
+  if(g==='貼り'){const ps=(j.part.split('｜')[1]||'').split('・');return ps.map((p,i)=>`<label class="f">${esc(p)}の作業数（個）</label>${num('mq'+i)}`).join('');}
+  if(g==='前加工')return `<label class="f">作業数（枚・個）</label>${num('mq0')}`;
+  if(g==='セット')return `<label class="f">セットできた数（個）</label>${num('mq0')}<label class="f">足りない・不良（個）</label>${num('mBad','0')}`;
+  if(g==='検品・梱包')return `<label class="f">良品数（個）</label>${num('mq0')}<label class="f">不良（個）</label>${num('mBad','0')}`;
+  return '';}
+function qtyValue(j,m){const g=j.part.split('｜')[0];const v=id=>{const e=m.querySelector('#'+id);return e?e.value.trim():'';};
+  if(g==='貼り'){const ps=(j.part.split('｜')[1]||'').split('・');return ps.length>1?ps.map((p,i)=>`${p}${v('mq'+i)||0}`).join('・'):v('mq0');}
+  return v('mq0');}
+function pzMemo(j,end){const out=[];const t={};(j.pzr||[]).forEach(([r,ms])=>{const k=r||'理由なし';t[k]=(t[k]||0)+ms;});
+  if(j.pauseStart){const k=j.pauseReason||'理由なし';t[k]=(t[k]||0)+(end-j.pauseStart);}
+  const ks=Object.keys(t).filter(k=>t[k]>=60000);if(ks.length)out.push('中断 '+ks.map(k=>k+Math.round(t[k]/60000)+'分').join('/'));
+  if(j.partial)out.push('途中終了:'+(j.stopReason||'理由なし'));
+  if(j.pre)out.push('記録前に'+j.pre+'個済み');if(j.fixPart)out.push('工程を修正（元：'+j.fixPart+'）');if(j.fixStart)out.push('開始時刻修正');
+  const P=pace(j);if(P){const w=work(j,end)/60000;const gq=(String(j._good||'').match(/\d+(\.\d+)?/g)||[]).reduce((a,x)=>a+(+x),0);out.push('ペース目標'+r1(P.rate)+(gq&&w>0?'/実績'+r1(Math.max(0,gq-(j.pre||0))/w):''));}
+  return out;}
+function finishJob(j0,endAt){const j=JSON.parse(JSON.stringify(j0));
+  let end=endAt||Date.now(), wm=work(j,end); const n=j.workers.length; let adj=[];const wl=()=>{if(!(j.wlog||[]).length)return;const d=Math.round(personMin(j,end)-wm/60000*n);adj=d?[{k:d>0?'+':'-',n:1,m:Math.abs(d)}]:[];};wl();
+  const MEMO=['段取り替えあり','材料待ち','機械不調','手直しあり','応援あり'];let memos=[];
+  const m=sheet(`<h2 style="margin:0 0 8px">${j.partial?'作業を途中で終了':'作業を完了'}</h2>${j.partial?`<p class="note" style="margin:0 0 8px">理由：${esc(j.stopReason||'')}。できたところまでの数を入れてください。</p>`:''}
+   <div class="kv"><div>案件</div><div>${esc(j.item)}${jobMeta(j)?`<div class="note">${jobMeta(j)}</div>`:''}</div><div>部品</div><div>${esc(j.part)}</div><div>作業者</div><div>${esc(j.workers.join('・'))}（${n}人）</div>
+   <div>時間</div><div id="mTm"></div><div>人時</div><div><b id="mMH"></b></div></div><div id="mPace"></div>
+   ${j.late?`<p class="note">あとから入力（${md(ymd(j.startAt))}）</p>`:`<details style="margin-top:8px"><summary class="note" style="font-size:15px">終了時刻を直す（完了の押し忘れ）</summary><input type="time" id="mEnd" style="margin-top:8px"><p class="note">本当に終わった時刻を入れてください。</p></details>`}
+   ${qtyFields(j)}${j.pre?`<p class="note" style="color:var(--ink)">記録を始める前の ${j.pre}個 も含めた、今日できた合計を入れてね。</p>`:''}
+
+   <details style="margin-top:12px"><summary class="note" style="font-size:15px">メモを書く（任意）</summary><input id="mMemo" placeholder="例：糊の乾き待ちで30分止まった" style="margin-top:8px"></details>
+   <button class="btn fill big block" id="mOk">記録して送る</button><button class="btn block" id="mNo">作業に戻る</button>`);
+  let ak='+',an=1,am=30;
+  const mh=()=>r2(wm/3600000*n+adj.reduce((a,x)=>a+(x.k==='+'?1:-1)*x.n*x.m/60,0));
+  const upd=()=>{const P=pace(j),pe=m.querySelector('#mPace');if(P&&pe&&!j.partial){const d=Math.round(P.eff-wm/60000);pe.innerHTML=d>=0?`<div style="margin-top:8px;background:#e3f4ea;border:2px solid #2e8b57;border-radius:12px;padding:8px;text-align:center;color:#1e6b41;font-weight:900;font-size:19px">👍 予定より 約${d}分早く終わりました！</div>`:`<div style="margin-top:8px;background:#fdecea;border:2px solid #d0342c;border-radius:12px;padding:8px;text-align:center;color:#b3261e;font-weight:900;font-size:19px">予定より 約${-d}分オーバー</div><p class="note" style="text-align:center">原因（段取り・材料・人数など）をメモに残すと次に活かせます</p>`;}
+  m.querySelector('#mMH').textContent=mh()+' 人時';m.querySelector('#mTm').innerHTML=`${hm(j.startAt)}〜${hm(end)}／実作業 <b>${r1(wm/60000)}分</b>`;};
+  const me=m.querySelector('#mEnd');if(me)me.onchange=()=>{if(!me.value){end=endAt||Date.now();}else{const e=new Date(ymd(j.startAt)+'T'+me.value+':00').getTime();if(e<=j.startAt){toast('開始より前です');me.value='';return;}end=e;j.fixEnd=true;}
+    wm=work(j,end);wl();upd();};
+  const pick=(attr,set)=>m.querySelectorAll(`[${attr}]`).forEach(el=>el.onclick=()=>{m.querySelectorAll(`[${attr}]`).forEach(x=>x.classList.remove('on'));el.classList.add('on');set(el.getAttribute(attr));});
+
+
+  upd();
+  if(j.late)m.querySelector('#mNo').textContent='やめる';
+  m.querySelector('#mNo').onclick=()=>m.remove();
+  m.querySelector('#mOk').onclick=()=>{if(j.late)wm=work(j,end);wl();
+    const rec=queue({QQKIND:'作業日報',QQDATE:ymd(j.startAt),QQCASE:j.caseKey,QQPART:j.part,QQWORKERS:j.workers.join('・'),QQNUM:n,
+      QQSTART:hm(j.startAt),QQEND:hm(end),QQWORK:r1(wm/60000),QQPAUSE:r1(paused(j,end)/60000),
+      QQADJ:(j.wlog||[]).length?'人の入れ替え '+[(j.workers0||j.workers).length+'人'].concat(j.wlog.map(x=>`${hm(x.t)}→${x.w.length}人`)).join(' '):adj.map(x=>`${x.k==='+'?'応援':'中抜け'}${x.n}人×${x.m}分`).join('・'),QQMH:mh(),
+      QQGOOD:(j._good=qtyValue(j,m)),QQBAD:m.querySelector('#mBad')?(m.querySelector('#mBad').value.trim()||'0'):'',QQPLAN:j.plan||'',
+      QQMEMO:memos.concat(pzMemo(j,end)).concat(brk(j,end)>60000?[`休憩${Math.round(brk(j,end)/60000)}分を除外`]:[]).concat(j.late?['あとから入力']:j.fixEnd?['終了時刻修正']:[]).concat(m.querySelector('#mMemo').value.trim()||[]).join('・')});
+    const G2=j.part.split('｜');S.doneLog=(S.doneLog||[]).filter(x=>x.d>=ymd(Date.now()-3*86400000)).concat({rid:rec.QQRID,job:JSON.parse(JSON.stringify(j0)),d:ymd(j.startAt),item:j.item,part:j.part,key:j.caseKey,subs:G2[0]==='貼り'?(G2[1]||'').split('・'):[partOfGroup(j)],t:Date.now(),id:j.id,who:j.workers.join('・'),s:hm(j.startAt),e:hm(end),m:rec.QQWORK,q:rec.QQGOOD||''}).slice(-80);
+    S.jobs=S.jobs.filter(x=>x.id!==j.id);save();m.remove();render();sendSheet(rec,`記録しました（${rec.QQMH}人時）`);
+  };
+}
+
+/* ----- 出退勤 ----- */
+function attRec(P,d,a){const awayMin=r1((a.aways||[]).reduce((s,x)=>s+((x[1]||a.out)-x[0]),0)/60000);const pe=new Date(d+'T'+prof(P).end+':00').getTime();
+  return queue({QQKIND:'勤怠',QQDATE:d,QQWORKERS:P,QQNUM:1,QQSTART:hm(a.in),QQEND:hm(a.out),QQWORK:r1(attCalc(a,P)),QQPAUSE:awayMin,
+    QQADJ:(a.aways||[]).map(x=>`${hm(x[0])}-${hm(x[1]||a.out)}`).join('・'),QQPART:`${prof(P).type} ${prof(P).start}-${prof(P).end}`,
+    QQMEMO:[a.early?'始業前から勤務':'',a.note||'',a.out>pe+60000?'所定外 '+Math.round((a.out-pe)/60000)+'分':''].filter(Boolean).join('・')});}
+function prof(n){const base={type:'正社員',start:'08:30',end:'17:30',breaks:['12:00-13:00']};return Object.assign(base,(cfg('profiles')||{})[n]||{});}
+function attDay(name,d){S.att[name]=S.att[name]||{};return S.att[name][d];}
+function attCalc(a,P){ // 勤務分（その人の始業・休憩で計算）
+  if(!a||!a.in) return 0; const end=a.out||Date.now(); const pf=prof(P||a.who||''); const ws=pf.start;
+  let st=a.in; const day=ymd(a.in); const sched=new Date(day+'T'+ws+':00').getTime();
+  if(!a.early&&st<sched) st=sched;
+  let mins=Math.max(0,(end-st)/60000);
+  // 中抜け
+  const aways=(a.aways||[]).map(x=>[x[0],x[1]||end]);
+  // 定時休憩（中抜けと重なる分は二重に引かない）
+  const brs=pf.breaks.map(b=>b.split('-')).filter(b=>b.length===2).map(([s,e])=>[new Date(day+'T'+s+':00').getTime(),new Date(day+'T'+e+':00').getTime()]);
+  const segs=aways.concat(brs).map(([s,e])=>[Math.max(s,st),Math.min(e,end)]).filter(([s,e])=>e>s).sort((x,y)=>x[0]-y[0]);
+  let off=0,cs=null,ce=null;segs.forEach(([s,e])=>{if(cs===null){cs=s;ce=e;}else if(s<=ce){ce=Math.max(ce,e);}else{off+=ce-cs;cs=s;ce=e;}});if(cs!==null)off+=ce-cs;
+  return Math.max(0,mins-off/60000);
+}
+V.att=()=>{const now=Date.now(),d=ymd(now),P=ui.p||'';const a=P?attDay(P,d):null;
+  const st=!a?'未出勤':a.out?'退勤済み':a.away?'中抜け中':'出勤中';
+  const month=ui.month||d.slice(0,7);const days=S.att[P]||{};
+  const [Y,M]=month.split('-').map(Number);const first=new Date(Y,M-1,1).getDay(),last=new Date(Y,M,0).getDate();
+  let cells='';for(let i=0;i<first;i++)cells+='<div class="h"></div>';
+  let tot=0,cnt=0;for(let i=1;i<=last;i++){const k=`${month}-${pad(i)}`,x=days[k];const mm=x?attCalc(x,P):0;if(x&&x.in){tot+=mm;cnt++;}
+    cells+=`<div class="${x&&x.in?'w':''}">${i}${x&&x.in?`<b>${r1(mm/60)}h</b>`:''}</div>`;}
+  const today=Object.entries(S.att).filter(([n,x])=>x[d]&&x[d].in).map(([n,x])=>`${esc(n)}：${x[d].out?'退勤':x[d].away?'中抜け中':'出勤中'}`);
+  return bar('出退勤','home')+`<div class="wrap"><div class="card">
+   <label class="f" style="margin-top:0">誰の打刻？</label>${whoChips(P,'data-p')}
+   ${today.length?`<p class="note">今日：${today.join('　')}</p>`:''}</div>
+  ${P?`<div class="card">
+   <div class="clock"><span class="note">${d.replace(/-/g,'/')}（${wd(d)}）</span><b id="clk">${ui.tm||hm(now)}</b><span class="note">${esc(P)}・${st}</span></div>
+   ${a&&a.in?`<p class="note" style="text-align:center">出勤 ${hm(a.in)}${(a.aways||[]).map(x=>`・中抜け ${hm(x[0])}〜${x[1]?hm(x[1]):''}`).join('')}${a.out?`・退勤 ${hm(a.out)}`:''}　勤務 ${r1(attCalc(a,P)/60)}h</p>`:''}
+   ${!a?`<label class="person" style="margin-top:12px" id="early"><span class="box">${ui.early?'✓':''}</span>今日は始業前から働く（打刻時刻から数える）</label>`:''}
+   <div class="chips c2" style="margin-top:12px">
+    <button class="btn fill big" id="aIn" ${a?'disabled':''}>出勤</button><button class="btn stop big" id="aOut" ${(a&&(a.out||a.away))?'disabled':''}>退勤</button>
+    <button class="btn warn" id="aAway" ${!a||a.out||a.away?'disabled':''}>中抜け</button><button class="btn" id="aBack" ${!a||!a.away?'disabled':''}>戻り</button></div>
+   <p class="note" style="margin:10px 0 0">※出退勤の記録は<b>端末ごと</b>です（端末どうしで同期しません）。出勤した端末と別の端末で退勤するときは、出勤時刻も入れてください。</p>
+   <details style="margin-top:12px" ${ui.tm?'open':''}><summary class="note" style="font-size:15px">時刻を指定して打刻（代理入力・打刻忘れ）</summary>
+    <input type="time" id="aTm" value="${esc(ui.tm||'')}" style="margin-top:8px"><p class="note">時刻を入れると、ボタンはその時刻で記録されます。空にすると今の時刻に戻ります。</p></details>
+   <button class="btn sm block" id="aLateBtn" style="margin-top:10px">打刻忘れの日をあとから入力</button>
+   <p class="note">${esc(P)}さん（${esc(prof(P).type)}）：${esc(prof(P).start)}〜${esc(prof(P).end)}・休憩 ${esc(prof(P).breaks.join('、')||'なし')}。始業前の打刻は始業から数え、休憩は自動で引きます。退勤時に1日分をまとめて送ります。</p></div>
+  ${ADMIN?`<div class="card"><h2 style="font-size:15px">${esc(P)}さんの勤務</h2><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><button class="btn sm" data-mon="-1">‹</button><b style="flex:1;text-align:center">${Y}年${M}月</b><button class="btn sm" data-mon="1">›</button></div>
+   <div class="cal">${'日月火水木金土'.split('').map(x=>`<div class="h">${x}</div>`).join('')}${cells}</div>
+   <p class="note">出勤 ${cnt}日・合計 ${r1(tot/60)}時間（この端末の記録）</p></div>`:''}`:''}</div>`;};
+B.att=()=>{$$('[data-p]').forEach(el=>el.onclick=()=>{ui.p=el.dataset.p;ui.tm='';render();});
+  const P=ui.p;if(!P)return;
+  tick=setInterval(()=>{const c=$('#clk');if(c&&!ui.tm)c.textContent=hm(Date.now());},5000);
+  const tmI=$('#aTm');if(tmI)tmI.onchange=()=>{ui.tm=tmI.value;render();};
+  const T=()=>{if(!ui.tm)return Date.now();return new Date(ymd(Date.now())+'T'+ui.tm+':00').getTime();};
+  const proxy=()=>ui.tm?'時刻指定':'';
+  const d=ymd(Date.now());S.att[P]=S.att[P]||{};const A=S.att[P];
+  const e=$('#early');if(e)e.onclick=()=>{ui.early=!ui.early;render();};
+  $('#aIn').onclick=()=>{A[d]={in:T(),aways:[],early:!!ui.early,note:proxy(),who:P};ui.tm='';save();render();toast(P+'さん 出勤｜'+pick(HK.in));};
+  $('#aAway').onclick=()=>{A[d].aways.push([T(),null]);A[d].away=true;if(ui.tm)A[d].note='時刻指定';ui.tm='';save();render();};
+  $('#aBack').onclick=()=>{const x=A[d].aways[A[d].aways.length-1];x[1]=T();A[d].away=false;if(ui.tm)A[d].note='時刻指定';ui.tm='';save();render();};
+  $('#aOut').onclick=()=>!A[d]?(toast('この端末に出勤の記録がありません。出勤時刻を入れて退勤してください'),$('#aLateBtn').click(),setTimeout(()=>{const o=document.querySelector('#pO');if(o)o.value=hm(Date.now());},50)):confirmSheet(`${P}さん、退勤しますか？`,'退勤する',()=>{const a=A[d];a.out=T();if(ui.tm)a.note='時刻指定';ui.tm='';save();
+    const rec=attRec(P,d,a);render();sendSheet(rec,`${P}さん お疲れさまでした（${r1(attCalc(a,P)/60)}時間）`);});
+  const lb=$('#aLateBtn');if(lb)lb.onclick=()=>{const t=ymd(Date.now());const ex=d0=>A[d0];
+    const m=sheet(`<h2 style="margin:0 0 4px">${esc(P)}さん・あとから入力</h2><p class="note" style="margin-top:0">打刻を忘れた日の出勤〜退勤を入れます。すでに記録がある日は上書きします。</p>
+     <label class="f">日付</label><input type="date" id="pD" value="${t}" max="${t}">
+     <div class="chips c2"><div><span class="lbl">出勤</span><input type="time" id="pI" value="${esc(prof(P).start)}"></div><div><span class="lbl">退勤</span><input type="time" id="pO" value="${esc(prof(P).end)}"></div></div>
+     <div class="note" style="margin-top:10px">中抜け（あれば）</div><div class="chips c2"><div><span class="lbl">から</span><input type="time" id="pA1"></div><div><span class="lbl">まで</span><input type="time" id="pA2"></div></div>
+     <label class="person" style="margin-top:10px" id="pE"><span class="box"></span>始業前から働いた（出勤時刻から数える）</label>
+     <p class="note" id="pInfo"></p>
+     <button class="btn fill big block" id="pOk">記録して送る</button><button class="btn block" id="pNo">やめる</button>`);
+    let early=false;const pE=m.querySelector('#pE');pE.onclick=()=>{early=!early;pE.querySelector('.box').textContent=early?'✓':'';};
+    const info=()=>{const d0=m.querySelector('#pD').value,x=ex(d0);m.querySelector('#pInfo').textContent=x&&x.in?`この日の記録：出勤 ${hm(x.in)}${x.out?'・退勤 '+hm(x.out):'・退勤なし'}（上書きされます）`:'';
+      if(x&&x.in){m.querySelector('#pI').value=hm(x.in);if(x.out)m.querySelector('#pO').value=hm(x.out);}};
+    m.querySelector('#pD').onchange=info;info();
+    m.querySelector('#pNo').onclick=()=>m.remove();
+    m.querySelector('#pOk').onclick=()=>{const d0=m.querySelector('#pD').value,i=m.querySelector('#pI').value,o=m.querySelector('#pO').value;
+      if(!d0||!i||!o){toast('日付・出勤・退勤を入れてください');return;}const ts=v=>new Date(d0+'T'+v+':00').getTime();
+      if(ts(o)<=ts(i)){toast('退勤が出勤より前です');return;}
+      const a1=m.querySelector('#pA1').value,a2=m.querySelector('#pA2').value;const aways=a1&&a2&&ts(a2)>ts(a1)?[[ts(a1),ts(a2)]]:[];
+      const a={in:ts(i),out:ts(o),aways,early,note:'あとから入力',who:P};A[d0]=a;save();m.remove();
+      const rec=attRec(P,d0,a);render();sendSheet(rec,`${md(d0)} の勤務を記録しました（${r1(attCalc(a,P)/60)}時間）`);};};
+  $$('[data-mon]').forEach(el=>el.onclick=()=>{const [y,m]=(ui.month||d.slice(0,7)).split('-').map(Number);const t=new Date(y,m-1+(+el.dataset.mon),1);ui.month=t.getFullYear()+'-'+pad(t.getMonth()+1);render();});
+};
+
+/* ----- 機械メンテ ----- */
+const MWORK=['日常点検・清掃','給油','部品交換','修理','不具合の発見'],MRES=['異常なし','要観察','要修理'];
+const CWORK=['掃除','整理整頓','ゴミ出し','備品の補充'];
+V.maint=()=>{const f=ui.f||(ui.f={where:'機械',mc:'',w:'',r:''});f.where='機械';const ms=cfg('machines');const isM=f.where==='機械';
+  const hist=allMaint().slice(0,20);
+  const ready=f.where&&f.w&&f.who&&(!isM||f.mc);
+  return bar('機械メンテ','home')+`<div class="wrap"><div class="card">
+  ${isM?`<label class="f" style="margin-top:0">機械</label><div class="chips">${ms.map(x=>`<div class="chip ${f.mc===x?'on':''}" data-mc="${esc(x)}">${esc(x)}</div>`).join('')}</div>`:''}
+  ${f.where?`<label class="f">やったこと</label><div class="chips c2">${(isM?MWORK:CWORK).map(x=>`<div class="chip ${f.w===x?'on':''}" data-mw="${esc(x)}">${esc(x)}</div>`).join('')}</div>`:''}
+  ${isM&&f.w?`<label class="f">結果</label><div class="chips">${MRES.map(x=>`<div class="chip ${f.r===x?'on':''}" data-mr="${esc(x)}">${esc(x)}</div>`).join('')}</div>
+   <label class="f">次回の予定（任意）</label><div class="chips c4">${['1週間後','1か月後','3か月後','なし'].map(x=>`<div class="chip ${f.nx===x?'on':''}" data-nx="${x}">${x}</div>`).join('')}</div>`:''}
+  ${f.w?`<label class="f">だれが？</label>${whoChips(f.who,'data-who')}
+   <details style="margin-top:10px"><summary class="note" style="font-size:15px">メモを書く（任意）</summary><input id="mMemo" placeholder="${isM?'例：異音あり、刃の摩耗':'例：洗剤が残り少ない'}" style="margin-top:8px"></details>`:''}
+  <button class="btn fill big block" id="mSave" ${ready?'':'disabled'}>${ready?'記録して送る':'機械・やったこと・名前を選んでね'}</button></div>
+  <div class="card"><h2>みんなの最近の記録</h2>${hist.length?hist.map(x=>`<div class="li"><div class="t"><b>${md(x.d)}</b> ${esc(x.mc||x.where||'')}｜${esc(x.w)}${x.r?`｜<span style="color:${x.r==='異常なし'?'var(--main)':'var(--stop)'}">${esc(x.r)}</span>`:''}<div class="note">${esc(x.who)}${x.memo?'・'+esc(x.memo):''}${x.nx&&x.nx!=='なし'?'・次回 '+esc(x.nx):''}</div></div></div>`).join(''):'<p class="note">まだ記録はありません。</p>'}
+  <p class="note">みんなの記録は集計のたびに更新されます${BOARD.updated?'（最終 '+esc(BOARD.updated)+'）':''}。</p></div></div>`;};
+B.maint=()=>{const f=ui.f;const p=(a,k)=>$$(`[${a}]`).forEach(el=>el.onclick=()=>{f[k]=f[k]===el.getAttribute(a)?'':el.getAttribute(a);if(k==='where'){f.w='';f.mc='';f.r='';}render();});
+  p('data-wh','where');p('data-mc','mc');p('data-mw','w');p('data-mr','r');p('data-nx','nx');p('data-who','who');
+  $('#mSave').onclick=()=>{const me=$('#mMemo');const memo=me?me.value.trim():'';const d=ymd(Date.now());const isM=f.where==='機械';
+    S.maint.push({d,where:f.where,mc:isM?f.mc:'',w:f.w,r:isM?f.r:'',memo,nx:isM?(f.nx||''):'',who:f.who});if(S.maint.length>300)S.maint=S.maint.slice(-300);
+    const rec=isM?queue({QQKIND:'メンテ',QQDATE:d,QQCASE:f.mc,QQPART:f.w,QQWORKERS:f.who,QQSTART:hm(Date.now()),QQMEMO:[f.r,memo,f.nx&&f.nx!=='なし'?'次回'+f.nx:''].filter(Boolean).join('・')})
+      :queue({QQKIND:'清掃',QQDATE:d,QQCASE:f.where,QQPART:f.w,QQWORKERS:f.who,QQSTART:hm(Date.now()),QQMEMO:memo});
+    const n=bump('maint');ui.f={where:f.where,mc:f.mc,w:'',r:'',who:''};save();render();sendSheet(rec,n>1?`メンテ記録 今月${n}件目！`:'メンテを記録しました');};
+};
+
+/* ----- 写真 ----- */
+const PCAT=()=>Object.keys(cfg('photo')||{});
+V.photo=()=>{const f=ui.f||(ui.f={cat:'',key:''});const recent=nearCases();
+  return bar('写真','home')+`<div class="wrap"><div class="card">
+  ${BOARD.photos?`<div class="hkb" style="margin-top:0">📷 Dropboxに届いた写真（全員分）：今日 <b>${(BOARD.photos[ymd(Date.now())]||0)}</b>枚・この7日 <b>${Object.entries(BOARD.photos).filter(([d])=>d>=ymd(Date.now()-6*86400000)).reduce((a,[,n])=>a+n,0)}</b>枚<span class="note">（${esc(BOARD.updated||'')}時点）</span></div>`:''}
+  <label class="f" style="margin-top:0">① 分類</label><div class="chips">${PCAT().length?'':'<p class="note">送信先がまだ読み込めていません。少し待つか、管理者に確認してください。</p>'}${PCAT().map(x=>`<div class="chip ${f.cat===x?'on':''}" data-cat="${esc(x)}">${esc(x)}</div>`).join('')}</div>
+  <label class="f">② 案件（任意）</label><div class="pchips">${recent.map(c=>`<div class="pchip ${f.key===c.key?'on':''}" data-pk="${esc(c.key)}">${esc((c.item||'').slice(0,16))}</div>`).join('')}<div class="pchip ${f.key==='__none'?'on':''}" data-pk="__none">指定なし</div></div>
+  <label class="f">③ 写真を選ぶ（この端末の記録用）</label><input type="file" accept="image/*" id="pFile">
+  <div id="pPrev" class="thumbs" style="margin-top:8px"></div>
+  <a class="btn blue big block ${f.cat?'':'hidden'}" id="pSend" href="${esc(cfg('photo')[f.cat]||'#')}" target="_blank" rel="noopener">④ Dropboxに送る（${esc(f.cat||'')}）</a>
+  <p class="note">④を押すとDropboxの送信画面が開きます。同じ写真を選んで「アップロード」を押してください。写真は分類ごとのフォルダに入ります。</p></div>
+  <div class="card"><h2>この端末で送った写真</h2>${S.photos.length?`<div class="thumbs">${S.photos.slice().reverse().slice(0,30).map(p=>`<figure>${p.img?`<img src="${p.img}">`:'<div style="aspect-ratio:1;background:#eee;border-radius:8px"></div>'}<figcaption>${md(p.d)} ${esc(p.cat)}<br>${esc((p.item||'').slice(0,12))}</figcaption></figure>`).join('')}</div>`:'<p class="note">まだありません。</p>'}</div></div>`;};
+B.photo=()=>{const f=ui.f;
+  $$('[data-cat]').forEach(el=>el.onclick=()=>{f.cat=el.dataset.cat;render();});
+  $$('[data-pk]').forEach(el=>el.onclick=()=>{f.key=el.dataset.pk;render();});
+  $('#pFile').onchange=e=>{const file=e.target.files[0];if(!file)return;const img=new Image();const u=URL.createObjectURL(file);
+    img.onload=()=>{const c=document.createElement('canvas');const s=Math.min(1,320/Math.max(img.width,img.height));c.width=img.width*s;c.height=img.height*s;
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);f.thumb=c.toDataURL('image/jpeg',0.6);$('#pPrev').innerHTML=`<figure><img src="${f.thumb}"></figure>`;URL.revokeObjectURL(u);};img.src=u;};
+  const s=$('#pSend');if(s)s.addEventListener('click',()=>{const c=f.key&&f.key!=='__none'?caseBy(f.key):null;
+    S.photos.push({d:ymd(Date.now()),cat:f.cat,item:c?c.item:'',img:f.thumb||''});if(S.photos.length>60)S.photos=S.photos.slice(-60);
+    const n=bump('photo');save();f.thumb='';setTimeout(()=>{render();celebrate('photo','送信画面を開いたよ',n,'Dropboxの画面で写真を選んで「アップロード」まで押してね。届いた枚数は次の集計で上に出ます。');},700);});
+};
+
+/* ----- 梱包・重量 ----- */
+function packFor(b,ct,mode,meth,g,want){const o=Object.assign({sheet:2,gap:5,maxKg:20},cfg('packOpt')||{});meth=meth||[];
+  const ce=Object.assign({},ct);if(meth.includes('緩衝材')){ce.L-=2*o.gap;ce.W-=2*o.gap;ce.H-=2*o.gap;}if(meth.includes('敷紙')){ce.H-=2*o.sheet;}
+  const p=packCalc(b,ce,mode);if(!p)return {p:null,ce,o};
+  p.per=p.base+p.add;
+  if(g>0&&o.maxKg>0){const mx=Math.floor((o.maxKg*1000-ct.g)/g);if(mx<p.total){p.fit=p.total;p.total=Math.max(0,mx);p.capped=true;p.layers=p.total>0?Math.ceil(p.total/p.per):0;p.last=p.total-p.per*(p.layers-1);}}
+  p.max=p.total;want=Math.floor(+want||0);
+  if(want>0&&want<p.total){p.total=want;p.custom=true;p.layers=Math.ceil(p.total/p.per);p.last=p.total-p.per*(p.layers-1);}
+  else if(want>p.total){p.wantOver=want;}
+  p.adj=ce.L!==ct.L||ce.H!==ct.H;return {p,ce,o};}
+function niceCounts(max,qty){if(!max||!qty)return [];const out=[];for(let n=Math.min(max,qty);n>=1&&out.length<3;n--){if(qty%n===0&&qty/n<=60)out.push(n);}return out;}
+function packCalc(b,ct,mode){
+  const long=Math.max(b.w,b.d),short=Math.min(b.w,b.d);
+  let ors=mode==='flat'?[[b.w,b.d,b.h,'平置き']]:mode==='side'?[[long,b.h,short,'長辺側面を底']]:
+    [[long,b.h,short,'長辺側面を底'],[long,short,b.h,'平置き'],[short,b.h,long,'短辺側面を底']];
+  let best=null;
+  ors.forEach(([a,bb,c,name])=>{[[ct.L,ct.W,false],[ct.W,ct.L,true]].forEach(([X,Y,rot])=>{
+    if(a<=0||bb<=0||c<=0)return;const nx=Math.floor(X/a),ny=Math.floor(Y/bb),layers=Math.floor(ct.H/c);
+    const base=nx*ny;const rx=Math.floor((X-nx*a)/bb),ry=Math.floor(Y/a);const add=(nx>0||rx>0)?rx*ry:0;
+    const per=base+add,total=per*layers;
+    if(total>0&&(!best||total>best.total))best={a,b:bb,c,name,X,Y,rot,nx,ny,rx,ry,base,add,layers,total};});});
+  return best;
+}
+function packCap(p){if(!p||!p.total)return '';const part=(p.capped||p.custom)&&p.last<p.per;
+  return p.custom?`<div class="hkb" style="margin:8px 0 4px">📐 <b>指定 ${p.total}個入り</b>のイメージ（${p.layers}段${part?`・最上段は ${p.last}個`:''}）<span class="note">最大は ${p.max}個です</span></div>`
+   :p.capped?`<div class="hkb" style="margin:8px 0 4px">📐 <b>重さの上限で ${p.total}個入り</b>のイメージ（${p.layers}段${part?`・最上段は ${p.last}個`:''}）</div>`
+   :`<div class="hkb" style="margin:8px 0 4px">📐 <b>最大入り数（${p.total}個）</b>のイメージ</div>`;}
+function packSvg(p,ct){if(!p||!p.total)return '';const W=300,sc=W/p.X,H=p.Y*sc;let k=Math.min(p.per||(p.base+p.add),p.total);
+  let r=`<svg viewBox="-2 -2 ${W+4} ${H+20}" width="100%"><rect x="0" y="0" width="${W}" height="${H}" fill="#f3e3c6" stroke="#8a6a3a"/>`;
+  for(let i=0;i<p.nx;i++)for(let j=0;j<p.ny;j++)if(k-->0)r+=`<rect x="${i*p.a*sc}" y="${j*p.b*sc}" width="${p.a*sc}" height="${p.b*sc}" fill="#bcd8e3" stroke="#5f8796" stroke-width=".6"/>`;
+  for(let i=0;i<p.rx;i++)for(let j=0;j<p.ry;j++)if(k-->0)r+=`<rect x="${p.nx*p.a*sc+i*p.b*sc}" y="${j*p.a*sc}" width="${p.b*sc}" height="${p.a*sc}" fill="#6fa6c2" stroke="#3f6f88" stroke-width=".6"/>`;
+  r+=`<text x="${W/2}" y="${H+14}" font-size="11" text-anchor="middle" fill="#555">上面（1段目）${p.X}×${p.Y}mm</text></svg>`;
+  const Hs=ct.H*sc;let s=`<svg viewBox="-2 -2 ${W+4} ${Hs+20}" width="100%"><rect x="0" y="0" width="${W}" height="${Hs}" fill="#f3e3c6" stroke="#8a6a3a"/>`;
+  const cols=p.nx+p.rx,lastCols=(p.capped||p.custom)&&p.last<p.per?Math.max(1,Math.ceil(p.last/(p.per/cols))):cols;
+  for(let l=0;l<p.layers;l++){const y=Hs-(l+1)*p.c*sc,lim=l===p.layers-1?lastCols:cols;for(let i=0;i<Math.min(p.nx,lim);i++)s+=`<rect x="${i*p.a*sc}" y="${y}" width="${p.a*sc}" height="${p.c*sc}" fill="#bcd8e3" stroke="#5f8796" stroke-width=".6"/>`;
+    for(let i=0;i<Math.min(p.rx,Math.max(0,lim-p.nx));i++)s+=`<rect x="${p.nx*p.a*sc+i*p.b*sc}" y="${y}" width="${p.b*sc}" height="${p.c*sc}" fill="#6fa6c2" stroke="#3f6f88" stroke-width=".6"/>`;}
+  s+=`<text x="${W/2}" y="${Hs+14}" font-size="11" text-anchor="middle" fill="#555">側面 ${p.X}×${ct.H}mm・${p.layers}段${(p.capped||p.custom)&&p.last<p.per?`（最上段 ${p.last}個）`:''}</text></svg>`;return r+s;}
+function askName(c,cb,cur){const m=sheet(`<h2 style="margin:0 0 4px">何の箱の梱包ですか？</h2><p class="note" style="margin-top:0">あとで見て分かるように品名を残します。</p>
+   <label class="f">品名（必須）</label><input id="anN" value="${esc(cur?cur.name:(c?c.item:''))}" placeholder="例：かつお節インロー 小">
+   <label class="f">得意先（任意）</label><input id="anC" value="${esc(cur?cur.client||'':(c?c.client:''))}" placeholder="例：福岡生活道具店">
+   <button class="btn fill big block" id="anOk" style="margin-top:12px">${cur?'直す':'これで登録'}</button><button class="btn block" id="anNo">やめる</button>`);
+  m.querySelector('#anNo').onclick=()=>m.remove();
+  m.querySelector('#anOk').onclick=()=>{const n=m.querySelector('#anN').value.trim();if(!n){toast('品名を入れてください');return;}m.remove();cb(n,m.querySelector('#anC').value.trim());};}
+/* ----- 紙の在庫（全紙の枚数。入庫・出庫・使い切り） ----- */
+const pnorm=x=>String(x||'').normalize('NFKC').toLowerCase().replace(/[\u3041-\u3096]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60)).replace(/[\s　・\-ー]/g,'');  // ひらがな→カタカナにそろえる
+const pkey=(n,k)=>pnorm(n)+'|'+(k||'');
+function paperList(){const t0=PAPER.updated?new Date(PAPER.updated.replace(' ','T')+':00').getTime():0;
+  const d={};(S.paperLog||[]).filter(x=>x.t>t0).forEach(x=>{const e=d[x.key]=d[x.key]||{v:0,abs:null,last:'',locOnly:undefined};
+    if(x.kind==='置き場変更'){e.loc=x.l;if(e.locOnly===undefined)e.locOnly=true;e.last=ymd(x.t);return;}e.locOnly=false;if(x.kind==='入庫')e.v+=x.n;else if(x.kind==='出庫')e.v-=x.n;else if(x.kind==='使い切り'){e.abs=0;e.v=0;}else if(x.kind==='数合わせ'){e.abs=x.n;e.v=0;}e.last=ymd(x.t);});
+  const LM=S.paperLocMap||{};const ml=l=>String(l||'').split('・').map(t=>LM[t]||t).join('・');
+  const L=(PAPER.items||[]).map(i=>{const k=pkey(i.n,i.k),x=d[k];const onlyLoc=x&&x.abs===null&&x.v===0&&!x.last2;return Object.assign({},i,{key:k,l:ml(x&&x.loc?x.loc:i.l),s:x?((x.abs!==null?x.abs:i.s)+x.v):i.s,u:x&&!x.locOnly?0:i.u,d:x?x.last:i.d,mine:!!x});});
+  (S.paperLog||[]).filter(x=>x.t>t0&&x.isNew&&!L.some(i=>i.key===x.key)).forEach(x=>{const v=d[x.key];L.push({id:'',n:x.n0,k:x.k,l:x.l,s:(v.abs!==null?v.abs:0)+v.v,u:0,d:v.last,key:x.key,mine:true,neu:true});});
+  return L;}
+function presHtml(q){const L=paperList();const qs=String(q||'').normalize('NFKC').toLowerCase().split(/[\s　]+/).map(pnorm).filter(Boolean);
+  const hit=qs.length?L.filter(i=>qs.every(w=>pnorm(i.n+i.k+i.l).includes(w))):[];
+  return qs.length?(hit.length?`<div class="card">${hit.slice(0,40).map(paperRow).join('')}${hit.length>40?`<p class="note">ほか${hit.length-40}件。もう少し絞ってね</p>`:''}</div>`:`<div class="card"><p class="note">見つかりません。台帳にない紙なら、下の「台帳にない紙を入庫」から登録してね。</p></div>`):'';}
+function paperAll(){const L=paperList();const locs=[...new Set(L.map(i=>i.l||'置き場未定'))].sort();const fl=ui.pl||'すべて',fs=ui.ps||'すべて';
+  const H=L.filter(i=>(fl==='すべて'||(i.l||'置き場未定')===fl)&&(fs==='すべて'||(fs==='在庫あり'?(!i.u&&i.s>0):fs==='未確認'?i.u:(!i.u&&i.s<=0))));
+  return `<div class="card"><h2 style="margin:0 0 8px">一覧（${H.length}件）</h2>
+   <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">${['すべて'].concat(locs).map(x=>`<div class="chip ${fl===x?'on':''}" style="padding:6px 12px;font-size:14px;min-height:0" data-pl="${esc(x)}">${esc(x)}</div>`).join('')}</div>
+   <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">${['すべて','在庫あり','在庫なし','未確認'].map(x=>`<div class="chip ${fs===x?'on':''}" style="padding:6px 12px;font-size:14px;min-height:0" data-ps="${x}">${x}</div>`).join('')}</div>
+   ${H.slice(0,ui.pmore?999:60).map(paperRow).join('')||'<p class="note">該当なし</p>'}${H.length>60&&!ui.pmore?`<button class="btn block" id="pMore">残り${H.length-60}件を表示</button>`:''}</div>`;}
+function paperRow(i){return `<div class="li" data-pp="${esc(i.key)}" style="cursor:pointer"><div class="t"><b>${esc(i.n)}</b> ${i.k?`<span class="note">${esc(i.k)}</span>`:''}<div class="note">${esc(i.l||'置き場未定')}${i.d?'・最後の入出庫 '+md(i.d):''}${i.m?'・'+esc(i.m):''}${i.mine?'・<b style="color:var(--main)">この端末で記録あり</b>':''}</div></div>
+    <div style="text-align:right;white-space:nowrap">${i.u?'<b style="font-size:15px;color:#9a958a">未確認</b>':`<b style="font-size:22px;color:${i.s>0?'var(--ink)':'#b3261e'}">${i.s>0?i.s:'なし'}</b>${i.s>0?'<span class="note"> 枚</span>':''}`}</div></div>`;}
+V.paper=()=>{const q=ui.pq||'';
+  return bar('紙の在庫','home')+`<div class="wrap">
+  <div class="card"><input id="pq" value="${esc(q)}" placeholder="品名・色・斤量で探す（例：タント N-7、ビオトープ 黒）" autocomplete="off" style="font-size:18px">
+   <p class="note" style="margin:6px 0 0">全紙の枚数です。${PAPER.updated?`台帳 ${esc(PAPER.updated)} 時点。`:''}「未確認」はまだ数えていない紙です。</p></div>
+  <div id="pres">${presHtml(q)}</div>
+  <div id="pall" style="${q?'display:none':''}">${paperAll()}</div>
+  <button class="btn fill big block" id="pNew">＋ 台帳にない紙を入庫</button>
+  ${(S.paperLog||[]).length?`<div class="card"><h2>この端末の最近の記録</h2>${(S.paperLog||[]).slice(-5).reverse().map(x=>`<div class="li"><div class="t">${esc(x.n0)} ${esc(x.k||'')}<div class="note">${md(ymd(x.t))} ${hm(x.t)}・${esc(x.who||'')}</div></div><b>${esc(x.kind)}${x.kind==='使い切り'?'':' '+x.n+'枚'}</b></div>`).join('')}</div>`:''}
+  <p class="note">入庫＝紙が入ってきた／出庫＝断裁などで使った／使い切り＝その紙がなくなった／数を合わせる＝数えた枚数に直す（はじめて数えたときも）。断裁したあとの紙は在庫に入れません。</p></div>`;};
+function paperSheet(it){let kind='出庫',who=S.lastWho||'',cs='';const jobsCases=[...new Set(S.jobs.map(j=>j.caseKey).filter(k=>k&&k!=='（案件以外）'))];
+  const m=sheet(`<h2 style="margin:0 0 2px">${esc(it.n)} <span class="note">${esc(it.k||'')}</span></h2><p class="note" style="margin:0 0 8px">${esc(it.l||'置き場未定')}・今 <b>${it.u?'未確認':it.s>0?it.s+'枚':'なし'}</b></p>
+   <div class="seg">${['入庫','出庫','使い切り','数合わせ'].map(k=>`<div class="${k===kind?'on':''}" data-pk="${k}">${k==='数合わせ'?'数を合わせる':k}</div>`).join('')}</div>
+   <div id="pnBox"><label class="f">枚数</label><input id="pN" type="number" inputmode="numeric" min="1" style="font-size:26px;text-align:center" placeholder="枚"></div>
+   <div id="pcBox"><label class="f">どの案件で使った？（任意）</label><div class="chips">${jobsCases.map(k=>{const c=caseBy(k);return `<div class="chip" data-pc="${esc(k)}">${esc(c?c.item:k)}</div>`;}).join('')||'<span class="note">作業中の案件はありません</span>'}</div></div>
+   <label class="f">入力した人</label>${whoChips(who,'data-pw')}
+   <button class="btn fill big block" id="pOk" style="margin-top:10px">記録する</button><button class="btn block" id="pMv">📦 置き場を変える</button><button class="btn block" id="pNo">やめる</button>`);
+  m.querySelector('#pMv').onclick=()=>{const LOCS=cfg('paperLocs');let nl='';const m2=sheet(`<h2 style="margin:0 0 6px">置き場を変える</h2><p class="note">${esc(it.n)} ${esc(it.k||'')}　今：${esc(it.l||'未定')}</p>
+     <div class="chips">${LOCS.map(x=>`<div class="chip" data-mv="${esc(x)}">${esc(x)}</div>`).join('')}</div><input id="mvO" placeholder="ほかの置き場（設定にない場合）" style="margin-top:6px">
+     <button class="btn fill big block" id="mvOk" style="margin-top:10px">ここに移した</button><button class="btn block" id="mvNo">やめる</button>`);
+    m2.querySelectorAll('[data-mv]').forEach(x=>x.onclick=()=>{m2.querySelectorAll('[data-mv]').forEach(y=>y.classList.remove('on'));x.classList.add('on');nl=x.dataset.mv;m2.querySelector('#mvO').value='';});
+    m2.querySelector('#mvNo').onclick=()=>m2.remove();
+    m2.querySelector('#mvOk').onclick=()=>{const v=m2.querySelector('#mvO').value.trim()||nl;if(!v){toast('置き場を選んでね');return;}if(!who){toast('入力した人を選んでください');return;}m2.remove();m.remove();
+      S.paperLog=(S.paperLog||[]).concat({key:pkey(it.n,it.k),n0:it.n,k:it.k||'',l:v,kind:'置き場変更',n:0,who,t:Date.now()}).slice(-200);
+      const rec=queue({QQKIND:'紙',QQDATE:ymd(Date.now()),QQPART:`${it.n}｜${it.k||''}｜${v}`,QQWORKERS:who,QQGOOD:'0',QQMEMO:'置き場変更'});save();render();sendSheet(rec,`置き場を「${v}」に変えました`);};};
+  const sync=()=>{m.querySelectorAll('[data-pk]').forEach(x=>x.classList.toggle('on',x.dataset.pk===kind));m.querySelector('#pnBox').style.display=kind==='使い切り'?'none':'';m.querySelector('#pcBox').style.display=kind==='出庫'?'':'none';
+    m.querySelector('#pnBox label').textContent=kind==='数合わせ'?'今ある数（数えた枚数）':'枚数';};
+  m.querySelectorAll('[data-pk]').forEach(x=>x.onclick=()=>{kind=x.dataset.pk;sync();});
+  m.querySelectorAll('[data-pc]').forEach(x=>x.onclick=()=>{const on=x.classList.contains('on');m.querySelectorAll('[data-pc]').forEach(y=>y.classList.remove('on'));if(!on){x.classList.add('on');cs=x.dataset.pc;}else cs='';});
+  m.querySelectorAll('[data-pw]').forEach(x=>x.onclick=()=>{m.querySelectorAll('[data-pw]').forEach(y=>y.classList.remove('on'));x.classList.add('on');who=x.dataset.pw;});
+  m.querySelector('#pNo').onclick=()=>m.remove();sync();
+  m.querySelector('#pOk').onclick=()=>{const n=kind==='使い切り'?0:parseInt(m.querySelector('#pN').value,10);if(kind==='数合わせ'?!(n>=0):(kind!=='使い切り'&&!(n>0))){toast('枚数を入れてください');return;}if(!who){toast('入力した人を選んでください');return;}
+    if(kind==='出庫'&&!it.u&&it.s>0&&n>it.s&&!m.dataset.ok){m.dataset.ok='1';toast(`今の在庫（${it.s}枚）より多いよ。合っていればもう一度押してね`);return;}
+    paperRec(it,kind,n,who,cs,false);m.remove();};}
+function paperRec(it,kind,n,who,cs,isNew){S.lastWho=who;S.paperLog=(S.paperLog||[]).concat({key:pkey(it.n,it.k),n0:it.n,k:it.k||'',l:it.l||'',kind,n,who,t:Date.now(),isNew}).slice(-200);
+  const rec=queue({QQKIND:'紙',QQDATE:ymd(Date.now()),QQCASE:cs||'',QQPART:`${it.n}｜${it.k||''}｜${it.l||''}`,QQWORKERS:who,QQGOOD:String(n),QQMEMO:kind+(isNew?'・新規':'')});
+  save();render();sendSheet(rec,`${kind}を記録しました`);}
+function paperNewSheet(){let kg='',loc='',who=S.lastWho||'';const KG=['60㎏','70㎏','80㎏','90㎏','100㎏','110㎏','薄口','厚口','超厚口'],LOC=cfg('paperLocs');
+  const m=sheet(`<h2 style="margin:0 0 8px">新しい紙を入庫</h2><label class="f">品名</label><input id="nN" placeholder="例：タント N-7（色番号まで）">
+   <label class="f">斤量</label><div class="chips">${KG.map(x=>`<div class="chip" data-nk="${x}">${x}</div>`).join('')}</div><input id="nK" placeholder="ほかの斤量（例：130）" style="margin-top:6px">
+   <label class="f">置き場</label><div class="chips">${LOC.map(x=>`<div class="chip" data-nl="${x}">${x}</div>`).join('')}</div>
+   <label class="f">枚数</label><input id="nQ" type="number" inputmode="numeric" min="1" style="font-size:24px;text-align:center">
+   <label class="f">入力した人</label>${whoChips(who,'data-nw')}
+   <button class="btn fill big block" id="nOk" style="margin-top:10px">入庫を記録する</button><button class="btn block" id="nNo">やめる</button>`);
+  const one=(a,f)=>m.querySelectorAll(`[${a}]`).forEach(x=>x.onclick=()=>{m.querySelectorAll(`[${a}]`).forEach(y=>y.classList.remove('on'));x.classList.add('on');f(x.getAttribute(a));});
+  one('data-nk',v=>{kg=v;m.querySelector('#nK').value='';});one('data-nl',v=>loc=v);one('data-nw',v=>who=v);
+  m.querySelector('#nNo').onclick=()=>m.remove();
+  m.querySelector('#nOk').onclick=()=>{const n=m.querySelector('#nN').value.trim();const k2=m.querySelector('#nK').value.trim();const K=k2?(/^\d+(\.\d+)?$/.test(k2)?k2+'㎏':k2.replace(/kg|k$/i,'㎏')):kg;const q=parseInt(m.querySelector('#nQ').value,10);
+    if(!n){toast('品名を入れてください');return;}if(!(q>0)){toast('枚数を入れてください');return;}if(!who){toast('入力した人を選んでください');return;}
+    const ex=paperList().find(i=>i.key===pkey(n,K));m.remove();paperRec({n:ex?ex.n:n,k:K,l:loc||(ex&&ex.l)||''},'入庫',q,who,'',!ex);};}
+B.paper=()=>{const bind=()=>$$('[data-pp]').forEach(el=>el.onclick=()=>{const it=paperList().find(x=>x.key===el.dataset.pp);if(it)paperSheet(it);});
+  const i=$('#pq');if(i){let comp=false;const upd=()=>{ui.pq=i.value;$('#pres').innerHTML=presHtml(i.value);$('#pall').style.display=i.value?'none':'';bind();};   // 画面全体は書き直さない（日本語入力の変換を崩さないため）
+    i.addEventListener('compositionstart',()=>comp=true);i.addEventListener('compositionend',()=>{comp=false;upd();});
+    i.addEventListener('input',e=>{if(comp||e.isComposing)return;upd();});}
+  bind();
+  const nb=$('#pNew');if(nb)nb.onclick=paperNewSheet;
+  $$('[data-pl]').forEach(x=>x.onclick=()=>{ui.pl=x.dataset.pl;ui.pmore=false;render();});$$('[data-ps]').forEach(x=>x.onclick=()=>{ui.ps=x.dataset.ps;ui.pmore=false;render();});
+  const pm=$('#pMore');if(pm)pm.onclick=()=>{ui.pmore=true;render();};};
+V.pack=()=>{const t=ui.tab||'design';const f=ui.f||(ui.f={w:'',d:'',h:'',g:'',qty:'',ct:'IS-160A',mode:'side',meth:['緩衝材'],key:''});
+  const b={w:+f.w,d:+f.d,h:+f.h};let ct=cartons().find(c=>c.id===f.ct);if(!ct){ct=cartons()[0];f.ct=ct.id;}const PF=b.w&&b.d&&b.h?packFor(b,ct,f.mode,f.meth,+f.g||0,f.want):null;const p=PF&&PF.p&&PF.p.total>0?PF.p:null;
+  const qty=+f.qty||0,g=+f.g||0;const need=p&&qty?Math.ceil(qty/p.total):0;const frac=p&&qty?qty%p.total:0;
+  const full=p?(ct.g+p.total*g)/1000:0;const all=p&&qty?(need*ct.g+qty*g)/1000:0;
+  const near=nearCases();
+  let body='';
+  if(t==='design') body=`<div class="card">
+   <label class="f" style="margin-top:0">案件（任意・次の作業日の予定から。数量が入ります）</label><div class="pchips">${near.map(c=>`<div class="pchip ${f.key===c.key?'on':''}" data-pk="${esc(c.key)}">${esc((c.item||'').slice(0,14))}</div>`).join('')||'<span class="note">近日の予定はありません</span>'}</div>
+   <label class="f">箱の外寸（mm）</label><div class="chips">${['w','d','h'].map((k,i)=>`<div><span class="lbl">${['幅','奥行','高さ'][i]}</span><input type="number" inputmode="numeric" data-in="${k}" value="${esc(f[k])}"></div>`).join('')}</div>
+   <div class="chips c2" style="margin-top:8px"><div><span class="lbl">1個の重さ（g）</span><input type="number" inputmode="numeric" data-in="g" value="${esc(f.g)}"></div><div><span class="lbl">数量（個）</span><input type="number" inputmode="numeric" data-in="qty" value="${esc(f.qty)}"></div></div>
+   <label class="f">置き方</label><div class="chips">${[['side','長辺側面を底'],['all','いちばん多く'],['flat','平置き']].map(([k,l])=>`<div class="chip ${f.mode===k?'on':''}" data-mode="${k}">${l}</div>`).join('')}</div>
+   <label class="f">カートン</label><div class="chips c4">${cartons().map(c=>`<div class="chip ${f.ct===c.id?'on':''}" data-ct="${c.id}">${c.id.replace('IS-','')}<small>${c.size}</small></div>`).join('')}</div>
+   <p class="note">${ct.id}：内寸 ${ct.L}×${ct.W}×${ct.H}mm・${ct.g}g（設定で変更できます）</p>
+   <label class="f">梱包方法</label><div class="chips c4">${['敷紙','胴巻き','完全梱包','緩衝材'].map(x=>`<div class="chip ${f.meth.includes(x)?'on':''}" data-meth="${x}">${x}</div>`).join('')}</div></div>
+   <div class="card"><h2>結果</h2>${p?`${(()=>{const mx=p.capped&&!p.custom?p.total:(p.max||p.total);const nc=niceCounts(mx,qty).filter(n=>n!==mx);
+     return `<label class="f" style="margin-top:0">1ケースの入り数</label><div class="chips">
+      <div class="chip ${!f.want?'on':''}" data-want="">最大 ${mx}個${qty?`<small>${Math.ceil(qty/mx)}箱${qty%mx?'・端数'+qty%mx:''}</small>`:''}</div>
+      ${nc.map(n=>`<div class="chip ${+f.want===n?'on':''}" data-want="${n}">${n}個<small>${qty/n}箱ぴったり</small></div>`).join('')}</div>
+      <div class="addrow" style="margin-top:6px"><input type="number" inputmode="numeric" id="wantIn" placeholder="入り数を指定（例：100）" value="${f.want&&!nc.includes(+f.want)?esc(f.want):''}"><button class="btn sm" id="wantOk">指定</button></div>
+      ${p.custom?`<p class="note">指定 ${p.total}個入り（最大は ${mx}個）。すき間は緩衝材などで埋めてください。</p>`:''}${p.wantOver?`<p class="note" style="color:var(--stop)">${p.wantOver}個は入りません。最大 ${mx}個です。</p>`:''}`;})()}
+    <div class="big3"><div><span>入り数</span><b>${p.total}個</b></div><div><span>必要カートン</span><b>${need||'—'}${need?'箱':''}</b></div><div><span>満箱の重さ</span><b>${g?r2(full)+'kg':'—'}</b></div></div>
+    <p class="note">${p.name}・${p.layers}段／1段 ${p.base}個＋回転 ${p.add}個${(p.capped||p.custom)&&p.last<p.per?`（最上段は ${p.last}個）`:''}${qty?`／端数 ${frac}個・全体 ${g?r2(all)+'kg':'—'}`:''}</p>${packCap(p)}${packSvg(p,PF.ce)}
+    ${p.capped?`<p class="note" style="color:var(--stop)">⚠ 重さの上限 ${PF.o.maxKg}kg のため ${p.total}個まで（形としては ${p.fit}個入ります）</p>`:''}
+    ${p.adj?`<p class="note">${f.meth.includes('緩衝材')?`緩衝材のすき間 ${PF.o.gap}mm`:''}${f.meth.includes('緩衝材')&&f.meth.includes('敷紙')?'・':''}${f.meth.includes('敷紙')?`敷紙 ${PF.o.sheet}mm（上下）`:''}を引いた内寸 ${PF.ce.L}×${PF.ce.W}×${PF.ce.H}mm で計算</p>`:''}
+    <p class="note">濃い青＝90°回して入れる分、茶色＝すき間（緩衝材候補）。現物で確認してください。</p>
+    <div class="btns"><button class="btn fill" id="pkSave">この梱包を保存</button><button class="btn" id="pkA4">作業指示書</button></div>
+    <button class="btn block" id="pkRep" style="margin-top:8px">${ADMIN?'IS梱包仕様履歴に登録':'この梱包を管理者へ報告'}</button>
+    <p class="note">${ADMIN?'登録すると全員の端末の「IS梱包仕様履歴」に出ます。':'報告した仕様は、管理者が確認してIS梱包仕様履歴に登録します。'}</p>`
+    :`<p class="note">${PF&&PF.p&&PF.p.capped&&!PF.p.total?`<b style="color:var(--stop)">梱包できません：1個 ${esc(f.g)}g では、重さの上限 ${PF.o.maxKg}kg（カートン ${ct.g}g 込み）に1個も入りません。</b>`:b.w&&b.d&&b.h?'このカートンには入りません。置き方かカートンを変えてください。':'箱の外寸を入れてください。'}</p>`}</div>
+   ${cfg('packSpecs')&&cfg('packSpecs').length?`<div class="card"><h2>IS梱包仕様履歴</h2>${cfg('packSpecs').slice().reverse().map((x,i)=>`<div class="li"><div class="t">${x.client?`<span class="note">${esc(x.client)}</span><br>`:''}${esc(x.name)}<div class="note">${esc(x.w)}×${esc(x.d)}×${esc(x.h)}mm・${esc(x.ct)}・${esc(x.n)}個入り${x.g?'・1個'+esc(x.g)+'g':''}</div></div><button class="btn sm" data-sload="${cfg('packSpecs').length-1-i}">呼び出す</button>${ADMIN?`<button class="btn sm" data-sren="${cfg('packSpecs').length-1-i}">✎</button><button class="x" data-sdel="${cfg('packSpecs').length-1-i}">×</button>`:''}</div>`).join('')}</div>`:''}
+   ${S.packs.length?`<div class="card"><h2>この端末に保存した梱包</h2>${S.packs.slice().reverse().map((x,i)=>`<div class="li"><div class="t">${esc(x.name)}<div class="note">${x.w}×${x.d}×${x.h}mm・${esc(x.ct)}・${x.n}個入り</div></div><button class="btn sm" data-load="${S.packs.length-1-i}">呼び出す</button></div>`).join('')}</div>`:''}`;
+  if(t==='weight') body=`<div class="card"><p class="note" style="margin-top:0">毎回でなくてOK。問い合わせなどで測ったときに残します。</p>
+   <label class="f">案件</label><div class="pchips">${near.map(c=>`<div class="pchip ${f.wk===c.key?'on':''}" data-wk="${esc(c.key)}">${esc((c.item||'').slice(0,14))}</div>`).join('')}<div class="pchip ${f.wk==='__free'?'on':''}" data-wk="__free">その他</div></div>
+   ${f.wk==='__free'?`<input id="wName" placeholder="品名・仕様" style="margin-top:8px" value="${esc(f.wname||'')}" oninput="ui.f.wname=this.value">`:''}
+   <label class="f">1個の重さ（g）</label><input id="wG" type="number" inputmode="decimal" value="${esc(f.wg||'')}" oninput="ui.f.wg=this.value">
+   <label class="f">測った状態</label><div class="chips c2">${['フタ・身・内装込み','箱のみ','商品入り','カートン満箱'].map(x=>`<div class="chip ${f.ws===x?'on':''}" data-ws="${x}">${x}</div>`).join('')}</div>
+   <label class="f">測った人（任意）</label>${whoChips(f.wwho,'data-wwho')}
+   <button class="btn fill big block" id="wSave">記録して送る</button></div>
+   <div class="card"><h2>測った記録</h2>${S.weights.length?S.weights.slice().reverse().map(x=>`<div class="li"><div class="t">${esc(x.item)}<div class="note">${md(x.d)}・${esc(x.st)}・${esc(x.who)}</div></div><b>${x.g}g</b></div>`).join(''):'<p class="note">まだありません。</p>'}</div>`;
+  return bar('梱包・重量','home')+`<div class="wrap"><div class="seg"><div class="${t==='design'?'on':''}" data-tab="design">梱包設計</div><div class="${t==='weight'?'on':''}" data-tab="weight">重量記録</div></div>${body}</div>`;};
+B.pack=()=>{const f=ui.f;
+  $$('[data-tab]').forEach(el=>el.onclick=()=>{ui.tab=el.dataset.tab;render();});
+  $$('[data-in]').forEach(el=>el.onchange=()=>{f[el.dataset.in]=el.value;if(['w','d','h'].includes(el.dataset.in))f.want='';render();});
+  $$('[data-want]').forEach(el=>el.onclick=()=>{f.want=el.dataset.want;render();});
+  const wo=$('#wantOk');if(wo)wo.onclick=()=>{const v=Math.floor(+$('#wantIn').value||0);if(v<1){toast('1以上の数を入れてください');return;}f.want=String(v);render();};
+  $$('[data-mode]').forEach(el=>el.onclick=()=>{f.mode=el.dataset.mode;render();});
+  $$('[data-ct]').forEach(el=>el.onclick=()=>{f.ct=el.dataset.ct;render();});
+  $$('[data-meth]').forEach(el=>el.onclick=()=>{const v=el.dataset.meth;f.meth=f.meth.includes(v)?f.meth.filter(x=>x!==v):f.meth.concat(v);render();});
+  $$('[data-pk]').forEach(el=>el.onclick=()=>{f.key=el.dataset.pk;const c=caseBy(f.key);if(c&&c.qty)f.qty=c.qty;
+    const w=S.weights.slice().reverse().find(x=>x.key===f.key&&x.st!=='カートン満箱');if(w){f.g=w.g;toast(`重さ ${w.g}g（${w.st||'状態不明'}）を入れました`);}render();});
+  $$('[data-load]').forEach(el=>el.onclick=()=>{const x=S.packs[+el.dataset.load];Object.assign(f,{w:x.w,d:x.d,h:x.h,g:x.g,ct:x.ct,mode:x.mode,meth:x.meth});render();toast('呼び出しました');});
+  $$('[data-sload]').forEach(el=>el.onclick=()=>{const x=cfg('packSpecs')[+el.dataset.sload];Object.assign(f,{w:x.w,d:x.d,h:x.h,g:x.g,ct:x.ct,mode:x.mode,meth:x.meth||[],want:x.want||''});render();toast('呼び出しました');});
+  $$('[data-sren]').forEach(el=>el.onclick=()=>{const a=cfg('packSpecs').map(x=>Object.assign({},x));const i=+el.dataset.sren;askName(null,(n,cl)=>{a[i].name=n;a[i].client=cl;S.packSpecs=a;save();publishConf(null);},a[i]);});
+  $$('[data-sdel]').forEach(el=>el.onclick=()=>{const a=cfg('packSpecs').slice();confirmSheet(`「${a[+el.dataset.sdel].name}」をIS梱包仕様履歴から外しますか？`,'外す',()=>{a.splice(+el.dataset.sdel,1);S.packSpecs=a;save();publishConf(null);});});
+  const rp=$('#pkRep');if(rp)rp.onclick=()=>{if(!f.w||!f.d||!f.h){toast('箱の寸法を入れてください');return;}const c=caseBy(f.key);const ct=cartons().find(x=>x.id===f.ct)||cartons()[0];const p=packFor({w:+f.w,d:+f.d,h:+f.h},ct,f.mode,f.meth,+f.g||0,f.want).p;if(!p||!p.total){toast('梱包できない条件です');return;}
+    askName(c,(nm,cl)=>{
+    const spec={name:nm,client:cl,caseKey:c?c.key:'',w:f.w,d:f.d,h:f.h,g:f.g||'',ct:ct.id,mode:f.mode,meth:f.meth||[],n:p.total,want:f.want||'',at:ymd(Date.now())};
+    if(ADMIN){const a=(cfg('packSpecs')||[]).filter(x=>!((x.caseKey||x.name)===(spec.caseKey||spec.name)&&x.ct===spec.ct&&x.w==spec.w&&x.d==spec.d&&x.h==spec.h));a.push(spec);S.packSpecs=a;save();publishConf(null);return;}
+    const rec=queue({QQKIND:'梱包',QQDATE:spec.at,QQCASE:c?c.key:`${spec.client?spec.client+'｜':''}${spec.name}`,QQPART:`${spec.w}×${spec.d}×${spec.h}｜${spec.ct}｜${p.name}`,QQNUM:spec.n,QQGOOD:spec.g,QQMEMO:(spec.meth||[]).join('・')});
+    save();sendSheet(rec,'梱包の仕様を報告しました');});};
+  const sv=$('#pkSave');if(sv)sv.onclick=()=>{const c=caseBy(f.key);const p=packFor({w:+f.w,d:+f.d,h:+f.h},cartons().find(x=>x.id===f.ct),f.mode,f.meth,+f.g||0,f.want).p;if(!p||!p.total){toast('梱包できない条件です');return;}if(!c&&!sv.dataset.nm){askName(null,(n)=>{sv.dataset.nm=n;sv.click();});return;}const nm0=sv.dataset.nm;delete sv.dataset.nm;
+    S.packs.push({name:c?c.item:(nm0||`${f.w}×${f.d}×${f.h}の箱`),w:f.w,d:f.d,h:f.h,g:f.g,ct:f.ct,mode:f.mode,meth:f.meth,n:p.total});save();render();toast('保存しました');};
+  const a4=$('#pkA4');if(a4)a4.onclick=()=>{const c=caseBy(f.key),ct=cartons().find(x=>x.id===f.ct),PA=packFor({w:+f.w,d:+f.d,h:+f.h},ct,f.mode,f.meth,+f.g||0,f.want),p=PA.p;if(!p||!p.total){toast('梱包できない条件です');return;}const qty=+f.qty||0,g=+f.g||0;
+    const need=qty?Math.ceil(qty/p.total):0,frac=qty?qty%p.total:0;const kg=v=>r2(v/1000)+'kg';
+    const fullW=ct.g+p.total*g,fracW=frac?ct.g+frac*g:0,allW=qty?need*ct.g+qty*g:0;
+    const ic=(k,l)=>PKIC[k]?`<div>${PKIC[k]}${esc(l||k)}</div>`:'';
+    const m=sheet(`<div class="sheetA4"><div class="a4head">${hakosuke(48,'normal')}<div style="flex:1"><h3 style="margin:0">梱包作業指示書</h3><div style="font-size:12px">株式会社一新堂　作成 ${ymd(Date.now())}</div></div></div>
+     <table style="margin-bottom:8px;width:100%"><tr><th>得意先</th><td>${esc(c?c.client:'')}</td></tr><tr><th>品名</th><td>${esc(c?c.item:'')}</td></tr>
+     <tr><th>箱の外寸</th><td>${f.w}×${f.d}×${f.h}mm</td></tr><tr><th>カートン</th><td>${esc(ct.id)}（${ct.size}サイズ・内寸 ${ct.L}×${ct.W}×${ct.H}）</td></tr>
+     <tr><th>入り数</th><td><b style="font-size:18px">${p.total}個</b>（1段 ${p.per}個 × ${p.layers}段${(p.capped||p.custom)&&p.last<p.per?`・最上段 ${p.last}個`:''}${p.custom?`・指定入り数（最大 ${p.max}個）`:''}）</td></tr>
+     ${qty?`<tr><th>数量</th><td>${qty}個 → <b>${need}箱</b>${frac?`（最後の箱は ${frac}個）`:''}</td></tr>`:''}</table>
+     <div class="a4icons">${ic(p.name)}${f.meth.map(x=>ic(x)).join('')}${ic('カートン',ct.id.replace('IS-',''))}</div>
+     <div class="a4w"><div><span>1個の重さ</span><b>${g?g+'g':'—'}</b></div><div><span>満箱（${p.total}個＋箱${ct.g}g）</span><b>${g?kg(fullW):'—'}</b></div>
+      <div><span>${frac?`端数箱（${frac}個）`:qty?'総重量':'カートンのみ'}</span><b>${frac?(g?kg(fracW):'—'):qty?(g?kg(allW):'—'):kg(ct.g)}</b></div></div>
+     ${frac&&g?`<p style="font-size:13px;margin:4px 0">全体の重さ：${kg(allW)}（${need}箱）</p>`:''}
+     ${g?'':`<p style="font-size:13px;color:#c00;margin:4px 0">1個の重さが未入力です。重量記録から呼び出すか、入力すると重さが出ます。</p>`}
+     ${p.capped?`<p style="font-size:13px;color:#c00;margin:4px 0">重さの上限 ${PA.o.maxKg}kg のため ${p.total}個入り</p>`:''}${packCap(p)}${packSvg(p,PA.ce)}</div>
+     <div class="btns noprint"><button class="btn fill" id="mPrint">印刷・PDF</button><button class="btn" id="mClose">閉じる</button></div>
+     <p class="note noprint">スマホは画面を保存（スクリーンショット）でも使えます。</p>`);
+    m.querySelector('#mPrint').onclick=()=>window.print();
+    m.querySelector('#mClose').onclick=()=>m.remove();};
+  $$('[data-wk]').forEach(el=>el.onclick=()=>{f.wk=el.dataset.wk;render();});
+  $$('[data-ws]').forEach(el=>el.onclick=()=>{f.ws=el.dataset.ws;render();});
+  $$('[data-wwho]').forEach(el=>el.onclick=()=>{f.wwho=f.wwho===el.dataset.wwho?'':el.dataset.wwho;render();});
+  const ws=$('#wSave');if(ws)ws.onclick=()=>{const g=$('#wG').value.trim();if(!g){toast('重さを入れてください');return;}
+    const c=f.wk&&f.wk!=='__free'?caseBy(f.wk):null;const item=c?c.item:($('#wName')?$('#wName').value.trim():'')||'（品名なし）';
+    S.weights.push({d:ymd(Date.now()),key:c?c.key:'',item,g,st:f.ws||'',who:f.wwho||''});
+    const rec=queue({QQKIND:'重量',QQDATE:ymd(Date.now()),QQCASE:c?c.key:item,QQPART:f.ws||'',QQWORKERS:f.wwho||'',QQGOOD:g,QQMEMO:'1個の重さ(g)'});
+    f.wg='';f.wname='';save();render();sendSheet(rec,`${g}g を記録しました`);};
+};
+
+/* ----- 不良 ----- */
+const DTYPES=['汚れ','糊はみ出し','浮き・はがれ','角のつぶれ','キズ','寸法違い','箔ズレ・かすれ','印刷不良','数量不足','その他'];
+function caseChips(cur,attr){const near=nearCases();return `<div class="pchips">${near.map(c=>`<div class="pchip ${cur===c.key?'on':''}" ${attr}="${esc(c.key)}">${esc((c.item||'').slice(0,14))}</div>`).join('')}<div class="pchip ${cur==='__none'?'on':''}" ${attr}="__none">指定なし</div></div>`;}
+V.defect=()=>{const t=ui.tab||'rep';const f=ui.f||(ui.f={});const D=BOARD.defects;
+ const rep=`<div class="card">
+  <label class="f" style="margin-top:0">案件</label>${caseChips(f.key,'data-dk')}
+  <label class="f">どの工程で</label><div class="chips c2">${GROUPS.concat(['入荷・材料']).map(g=>`<div class="chip ${f.g===g?'on':''}" data-dg="${g}">${g}</div>`).join('')}</div>
+  <label class="f">どんな不良</label><div class="chips">${DTYPES.map(x=>`<div class="chip ${f.ty===x?'on':''}" data-dt="${x}">${x}</div>`).join('')}</div>
+  <label class="f">数（個）</label><input id="dN" type="number" inputmode="numeric" min="0" value="${esc(f.n||'')}">
+  <label class="f">見つけた人（任意）</label>${whoChips(f.who,'data-dw')}
+  <details style="margin-top:12px"><summary class="note" style="font-size:15px">メモを書く（任意）</summary><input id="dMemo" style="margin-top:8px"></details>
+  <button class="btn fill big block" id="dSave" ${f.g&&f.ty?'':'disabled'}>${f.g&&f.ty?'報告する':'工程と不良の種類を選んでください'}</button>
+  <a class="btn blue block" href="${esc(cfg('photo')['不良・トラブル'])}" target="_blank" rel="noopener">写真も送る（Dropbox）</a></div>`;
+ const sum=D&&D.total?`<div class="card"><h2>${esc(D.label||'今月')}の不良 ${D.total}件</h2>
+  <table><tr><th>種類</th><th>件数</th><th>個数</th></tr>${(D.byType||[]).map(r=>`<tr><td>${esc(r[0])}</td><td>${r[1]}</td><td>${r[2]||''}</td></tr>`).join('')}</table>
+  <h2 style="margin-top:14px">工程別</h2><table><tr><th>工程</th><th>件数</th><th>個数</th></tr>${(D.byProc||[]).map(r=>`<tr><td>${esc(r[0])}</td><td>${r[1]}</td><td>${r[2]||''}</td></tr>`).join('')}</table>
+  <p class="note">${esc(BOARD.updated)} 時点の全員分の集計です。</p></div>`
+  :`<div class="card"><div style="display:flex;gap:12px;align-items:center">${hakosuke(64,'normal')}<p class="note" style="margin:0">集計はまだありません。報告がたまると、全員分の種類別・工程別の件数がここに出ます。</p></div></div>`;
+ return bar('不良','home')+`<div class="wrap"><div class="seg"><div class="${t==='rep'?'on':''}" data-tab="rep">報告する</div><div class="${t==='sum'?'on':''}" data-tab="sum">集計を見る</div></div>${t==='rep'?rep:sum}</div>`;};
+B.defect=()=>{const f=ui.f;const keep=()=>{const y=scrollY;const n=$('#dN');if(n)f.n=n.value;render();scrollTo(0,y);};
+ $$('[data-tab]').forEach(el=>el.onclick=()=>{ui.tab=el.dataset.tab;render();});
+ $$('[data-dk]').forEach(el=>el.onclick=()=>{f.key=el.dataset.dk;keep();});
+ $$('[data-dg]').forEach(el=>el.onclick=()=>{f.g=el.dataset.dg;keep();});
+ $$('[data-dt]').forEach(el=>el.onclick=()=>{f.ty=el.dataset.dt;keep();});
+ $$('[data-dw]').forEach(el=>el.onclick=()=>{f.who=f.who===el.dataset.dw?'':el.dataset.dw;keep();});
+ const sv=$('#dSave');if(sv)sv.onclick=()=>{const c=f.key&&f.key!=='__none'?caseBy(f.key):null;
+  const rec=queue({QQKIND:'不良',QQDATE:ymd(Date.now()),QQCASE:c?c.key:'',QQPART:`${f.g}｜${f.ty}`,QQWORKERS:f.who||'',QQSTART:hm(Date.now()),QQGOOD:$('#dN').value.trim()||'',QQMEMO:$('#dMemo').value.trim()});
+  ui.f={};save();render();sendSheet(rec,'不良を報告しました');};
+};
+
+/* ----- 改善提案 ----- */
+const KCAT=['作業のやり方','道具・機械','安全','材料・ムダ','置き場・整理','その他'];
+const KEX=['〇〇がやりにくい → 〇〇にしたい','〇〇を置く場所があると便利','〇〇の待ち時間がもったいない','ヒヤッとした場所：','〇〇を先にやると早い','こんな道具があると助かる：'];
+function kMonth(){const m=ymd(Date.now()).slice(0,7);return (S.kaizenLog||[]).filter(d=>d.startsWith(m)).length;}
+function kaizenBadge(){const M=BOARD.month,ym=ymd(Date.now()).slice(0,7);const n=M&&M.ym===ym?(M.idea||0):0;return n?`<span class="badge" style="position:absolute;top:8px;right:8px">みんなで今月 ${n}件</span>`:'';}   // 会社全体の件数（集計済み）に統一
+V.kaizen=()=>{const f=ui.f||(ui.f={});return bar('改善提案','home')+`<div class="wrap">
+ <div class="hello"><span class="hk-jump" style="display:inline-block">${hakosuke(72,'idea')}</span><div class="msg"><b>気づいたこと、なんでもどうぞ</b><span>小さなことでも大歓迎！採用された提案はお知らせで紹介します</span>
+  <div class="bubble">${BOARD.kaizen&&BOARD.kaizen.month?`今月のみんなの提案：${BOARD.kaizen.month}件`:kMonth()?`この端末から今月 ${kMonth()}件 届いたよ`:'今月の一番乗り、待ってるよ！'}</div></div></div>
+ <div class="card"><label class="f" style="margin-top:0">どんなこと</label><div class="chips">${KCAT.map(x=>`<div class="chip ${f.cat===x?'on':''}" data-kc="${x}">${x}</div>`).join('')}</div>
+ <label class="f">書き出しの例（押すと入ります）</label><div class="chips">${KEX.map((x,i)=>`<div class="chip" data-kex="${i}" style="font-size:13px">${esc(x)}</div>`).join('')}</div>
+ <label class="f">内容</label><textarea id="kBody" rows="5" placeholder="例：断裁機の横に台があると紙を置きやすい">${esc(f.body||'')}</textarea>
+ <label class="f">名前（なしでもOK）</label>${whoChips(f.who,'data-kw')}
+ <button class="btn fill big block" id="kSave">送る</button>
+ <a class="btn blue block" href="${esc(cfg('photo')['その他'])}" target="_blank" rel="noopener">写真も送る（Dropbox）</a></div></div>`;};
+B.kaizen=()=>{const f=ui.f;const keep=()=>{f.body=$('#kBody').value;const y=scrollY;render();scrollTo(0,y);};
+ $$('[data-kc]').forEach(el=>el.onclick=()=>{f.cat=el.dataset.kc;keep();});
+ $$('[data-kex]').forEach(el=>el.onclick=()=>{const t=$('#kBody');t.value=(t.value?t.value+'\n':'')+KEX[+el.dataset.kex];t.focus();f.body=t.value;});
+ $$('[data-kw]').forEach(el=>el.onclick=()=>{f.who=f.who===el.dataset.kw?'':el.dataset.kw;keep();});
+ $('#kSave').onclick=()=>{const b=$('#kBody').value.trim();if(!b){toast('内容を書いてください');return;}
+  const rec=queue({QQKIND:'改善提案',QQDATE:ymd(Date.now()),QQPART:f.cat||'',QQWORKERS:f.who||'（名前なし）',QQMEMO:b});
+  S.kaizenLog=(S.kaizenLog||[]).concat(ymd(Date.now())).slice(-200);ui.f={};save();render();sendSheet(rec,'ありがとうございます！');};
+};
+
+/* ----- 掲示板 ----- */
+V.board=()=>{const f=ui.f||(ui.f={});if(BOARD.posts.length&&S.seenPost!==BOARD.posts[0].d+BOARD.posts[0].title){S.seenPost=BOARD.posts[0].d+BOARD.posts[0].title;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}return bar('掲示板','home')+`<div class="wrap">
+ ${BOARD.posts.length?BOARD.posts.map(p=>`<div class="card"><div class="note">${md(p.d)}（${wd(p.d)}）${p.who?'・'+esc(p.who):''}</div><h2 style="margin:4px 0 6px">${esc(p.title)}</h2><div style="white-space:pre-wrap">${esc(p.body||'')}</div></div>`).join('')
+  :`<div class="card"><div style="display:flex;gap:12px;align-items:center">${hakosuke(64,'normal')}<p class="note" style="margin:0">お知らせはまだありません。</p></div></div>`}
+ <details class="card"><summary style="font-weight:700">お知らせを書く（管理者）</summary>
+  <label class="f">タイトル</label><input id="bT" value="${esc(f.t||'')}">
+  <label class="f">内容</label><textarea id="bB" rows="5">${esc(f.b||'')}</textarea>
+  <label class="f">書いた人</label>${whoChips(f.who,'data-bw')}
+  <button class="btn fill block" id="bSave">投稿する</button>
+  <p class="note">送った内容は、次の更新のときに掲示板に載ります。</p></details></div>`;};
+B.board=()=>{const f=ui.f;const keep=()=>{f.t=$('#bT').value;f.b=$('#bB').value;render();const d=$('details.card');if(d)d.open=true;};
+ $$('[data-bw]').forEach(el=>el.onclick=()=>{f.who=f.who===el.dataset.bw?'':el.dataset.bw;keep();});
+ $('#bSave').onclick=()=>{const t=$('#bT').value.trim(),b=$('#bB').value.trim();if(!t){toast('タイトルを入れてください');return;}
+  const rec=queue({QQKIND:'掲示板',QQDATE:ymd(Date.now()),QQPART:t,QQWORKERS:f.who||'',QQMEMO:b});ui.f={};save();render();sendSheet(rec,'投稿しました');};
+};
+
+/* ----- マニュアル ----- */
+V.manual=()=>{const m=ui.m||'';const ms=cfg('machines');const list=(BOARD.manuals||{})[m]||[];
+ return bar('マニュアル','home')+`<div class="wrap"><div class="card"><label class="f" style="margin-top:0">機械</label><div class="chips">${ms.map(x=>`<div class="chip ${m===x?'on':''}" data-mm="${esc(x)}">${esc(x)}${((BOARD.manuals||{})[x]||[]).length?`<small>${((BOARD.manuals||{})[x]||[]).length}件</small>`:''}</div>`).join('')}</div></div>
+ ${m?`<div class="card"><h2>${esc(m)}</h2>${list.length?list.map(x=>`<a class="li" href="${esc(x.url)}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><span class="t"><b>${esc(x.title)}</b>${x.note?`<div class="note">${esc(x.note)}</div>`:''}</span><span class="note">開く ›</span></a>`).join('')
+  :`<div style="display:flex;gap:12px;align-items:center">${hakosuke(64,'normal')}<p class="note" style="margin:0">まだ登録されていません。マニュアルのPDFや動画をDropboxに入れて社長からClaudeに伝えると、ここに並びます。</p></div>`}</div>`:''}</div>`;};
+B.manual=()=>$$('[data-mm]').forEach(el=>el.onclick=()=>{ui.m=el.dataset.mm;render();});
+
+/* ----- 未送信 ----- */
+V.unsent=()=>bar('未送信の記録','home')+`<div class="wrap"><div class="card">${S.unsent.length?S.unsent.map(r=>`<div class="li"><div class="t"><b>${esc(r.QQKIND)}</b> ${md(r.QQDATE)}<div class="note">${esc(r.QQCASE||'')}${r.QQPART?'／'+esc(r.QQPART):''}${r.QQMH?'・'+r.QQMH+'人時':''}</div></div>
+  ${formsUrl(r)?`<a class="btn sm fill" href="${esc(formsUrl(r))}" target="_blank" rel="noopener" data-sent="${r.QQRID}">送る</a>`:'<span class="note">送信先未設定</span>'}</div>`).join(''):'<p class="note">ありません。</p>'}</div>${waiting().length?`<div class="card"><h2>到着確認待ち ${waiting().length}件</h2><p class="note">Formsを開いた記録です。次の集計で保管庫に届いたか確認します（届いていなければ「届いていない記録」に出ます）。</p>${waiting().slice(-20).reverse().map(r=>`<div class="li"><div class="t">${esc(r.QQKIND)}｜${esc(r.QQDATE||'')}<div class="note">${esc((r.QQCASE||r.QQWORKERS||'').slice(0,30))}</div></div><span class="note">確認待ち</span></div>`).join('')}</div>`:''}${missing().length?`<div class="card" style="border:2px solid var(--warn)"><h2>届いていない記録 ${missing().length}件</h2><p class="note">送信ボタンを押したあと、Formsで「送信」まで押されなかった可能性があります。</p>${missing().map(r=>`<div class="li"><div class="t">${esc(r.QQKIND)}｜${esc(r.QQDATE||'')}<div class="note">${esc((r.QQCASE||r.QQWORKERS||'').slice(0,30))}</div></div></div>`).join('')}<button class="btn fill block" id="reBack">未送信に戻して送り直す</button></div>`:''}</div>`;
+B.unsent=()=>{$$('[data-sent]').forEach(a=>a.addEventListener('click',()=>{markSent(a.dataset.sent);setTimeout(render,500);}));
+  const rb=$('#reBack');if(rb)rb.onclick=()=>{const ms=missing();ms.forEach(r=>{S.sentLog=S.sentLog.filter(x=>x.QQRID!==r.QQRID);if(!S.unsent.some(x=>x.QQRID===r.QQRID)){const c=Object.assign({},r);delete c._sent;delete c._ok;S.unsent.push(c);}});save();render();toast('未送信に戻しました。もう一度送ってください');};};
+
+/* ----- 自分の記録 ----- */
+function liveJobs(){const out=[];const seen=new Set();
+  const add=(st,dev,me)=>{(st.jobs||[]).forEach(j=>{const k=j.s+'|'+j.i+'|'+j.p;if(seen.has(k))return;seen.add(k);out.push(Object.assign({dev,me},j));});};
+  add(liveState(),S.devName||'この端末',true);
+  PEERS.forEach(pr=>{if(pr.sameTab)return;const st=pr.presence&&pr.presence.live;if(st&&st.app==='isshindo')add(st,st.dev||'端末',false);});
+  return out.sort((a,b)=>a.s-b.s);}
+V.live=()=>{const now=Date.now();const js=liveJobs();
+  const devs=PEERS.filter(pr=>!pr.sameTab&&pr.presence&&pr.presence.live).map(pr=>pr.presence.live);
+  const att=[...new Map(liveState().att.concat(...devs.map(d=>d.att||[])).map(a=>[a.n,a])).values()];
+  return bar('いまの現場','home')+`<div class="wrap">
+  <div class="card"><h2 style="margin:0">作業中 ${js.length}件</h2><p class="note" style="margin:4px 0 0">${ROOM?`つながっている端末：この端末＋${devs.length}台`:'リアルタイム接続なし（この端末の作業だけ表示）'}</p><p class="note" style="margin:2px 0 0;font-size:11px;color:#999">接続チェック：${ROOM?(ROOMCONN?'○ 接続中':'△ 接続待ち'):'× 未接続'}${ROOMERR?'（'+esc(ROOMERR)+'）':''}・部屋の人数 ${(PEERS||[]).length}（自分を含む）・他タブ ${(PEERS||[]).filter(p=>p.isMe&&!p.sameTab).length}・状態あり ${(PEERS||[]).filter(p=>!p.sameTab&&p.presence&&p.presence.live).length}</p></div>
+  ${js.map(j=>{const w=work({startAt:j.s,pausedMs:j.pm||0,pauseStart:j.ps||null,pz:j.pz||[]},now);return `<div class="card job"><div class="ttl">${esc(j.i)} ／ ${esc(j.p)}</div>
+    <div class="note">${esc(j.c)}${j.q?`・<b>${esc(j.q)}個</b>`:''}・${esc(j.dev)}</div>
+    <div class="st ${j.ps?'p':''}">${j.ps?'中断中':'作業中'}・${esc((j.w||[]).join('・'))}（${(j.w||[]).length}人）</div>
+    <div class="timer" style="font-size:34px">${hms(w)}</div><div class="note">昼休憩は自動で除いています</div><div class="note">開始 ${hm(j.s)}</div></div>`;}).join('')||'<div class="card"><p class="note">いま作業中の記録はありません。</p></div>'}
+  <div class="card"><h2>出勤中 ${att.length}人</h2>${att.map(a=>`<span class="chip" style="display:inline-block;margin:3px">${esc(a.n)}${a.a?'（中抜け）':''}</span>`).join('')||'<p class="note">いません</p>'}</div>
+  <p class="note">他の端末の様子は、その端末が claude.ai にログインしてアプリを開いているときだけ届きます。</p></div>`;};
+B.live=()=>{tick=setInterval(()=>{if(view==='live')render();},1000);};
+function allMaint(){const seen=new Set(),out=[];const k=x=>[x.d,x.mc,x.w,x.who].join('|');
+  (BOARD.maint||[]).forEach(x=>{seen.add(k(x));out.push(x);});
+  S.maint.filter(x=>x.mc).forEach(x=>{if(!seen.has(k(x)))out.push(Object.assign({mine:1},x));});
+  return out.sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:0);}
+V.team=()=>{const ym=ymd(Date.now()).slice(0,7);const has=BOARD.month&&BOARD.month.ym===ym;const M=has?BOARD.month:{work:'—',maint:'—',idea:'—'};const nv=v=>has?v:'—';
+  const done=(cfg('kaizenDone')||[]).filter(x=>(x.d||'').startsWith(ym));const goal=+cfg('kaizenGoal')||0;const idea=has?(M.idea||0):0;const pct=goal?Math.min(100,Math.round(idea/goal*100)):0;
+  return bar('今月のみんなの積み重ね','home')+`<div class="wrap">
+  <div class="hello"><span class="hk-jump" style="display:inline-block">${hakosuke(84,'team')}</span><div class="msg"><b>一つひとつの行動が、いい現場につながっているよ！</b><span>${has?`${esc(ym)}・${esc(BOARD.updated||'')}時点`:'今月の数字はまだ集計されていません（次の集計で出ます）'}</span></div></div>
+  <div class="card"><div class="big3" style="grid-template-columns:repeat(2,1fr)">
+   <div><span>作業記録</span><b>${nv(M.work+'件')}</b></div><div><span>機械メンテ</span><b>${nv(M.maint+'回')}</b></div>
+   <div><span>改善提案</span><b>${nv(idea+'件')}</b></div><div><span>実現した改善</span><b>${done.length}件</b></div></div></div>
+  <div class="card"><h2>みんなの改善提案${goal?`　今月の目標 ${goal}件`:''}</h2>
+   <p class="note" style="text-align:center;margin:6px 0 10px">${!has?'今月の件数は次の集計で出ます。':idea?`今月 ${idea}件の気づきが届いたよ。ありがとう！`:'今月はまだ0件。最初のひとつ、待ってるよ。'}</p>
+   ${''/* 箱の積み上げ表示（stackSvg）は保留中。再開するときはここに stackSvg(idea,...) を戻す */}
+   ${goal?`<div style="background:#eee8da;border-radius:99px;height:12px;overflow:hidden"><div style="width:${pct}%;height:100%;background:linear-gradient(90deg,#7cc39c,#4f9a78)"></div></div>
+   <p class="note">${idea>=goal?'目標達成！ありがとう！':`${idea} / ${goal}件`}</p>`:''}
+   <button class="btn fill block" data-go="kaizen">改善提案を送る</button></div>
+  <div class="card"><h2>今月実現した改善</h2>${done.length?done.map(x=>`<div class="li"><div class="t">✅ ${esc(x.title)}<div class="note">${md(x.d)}${x.who&&ADMIN?'・提案 '+esc(x.who):''}</div></div>${ADMIN?`<button class="x" data-kdel="${esc(x.d+'|'+x.title)}">×</button>`:''}</div>`).join(''):'<p class="note">これからです。提案が形になったらここに並びます。</p>'}</div>
+  ${ADMIN?`<div class="card"><h2>（管理者）実現した改善を追加</h2><input id="kdT" placeholder="例：断裁機横の材料置き場を改善"><input id="kdW" placeholder="提案した人（任意）" style="margin-top:8px">
+   <button class="btn fill block" id="kdAdd" style="margin-top:8px">追加して全員に反映</button>
+   <label class="f">今月の目標（件・0＝目標なし）</label><div class="addrow"><input id="kdG" type="number" inputmode="numeric" value="${goal}"><button class="btn sm" id="kdGs">保存して反映</button></div></div>`:''}
+  <p class="note">数字は記録の集計のたびに更新されます。順位はつけず、会社全体の積み重ねを見る画面です。</p></div>`;};
+B.team=()=>{const ym=ymd(Date.now()).slice(0,7),goal=+cfg('kaizenGoal')||0;
+  if(goal&&BOARD.month&&BOARD.month.ym===ym&&BOARD.month.idea>=goal&&S.goalSeen!==ym){S.goalSeen=ym;save();setTimeout(()=>celebrate('idea','今月の目標達成！',0,'みんなの気づきで、貼箱が目標まで積み上がりました。',true,'cheer'),400);}
+  const a=$('#kdAdd');if(a)a.onclick=()=>{const t=$('#kdT').value.trim();if(!t){toast('内容を入れてください');return;}
+    S.kaizenDone=(cfg('kaizenDone')||[]).concat({d:ymd(Date.now()),title:t,who:$('#kdW').value.trim()});save();publishConf(null).then(ok=>{if(ok)celebrate('idea','改善が実現しました！',0,t,true);});};
+  const g=$('#kdGs');if(g)g.onclick=()=>{S.kaizenGoal=Math.max(0,+$('#kdG').value||0);save();publishConf(null);};
+  $$('[data-kdel]').forEach(el=>el.onclick=()=>{const k=el.dataset.kdel;confirmSheet('この項目を外しますか？','外す',()=>{S.kaizenDone=(cfg('kaizenDone')||[]).filter(x=>x.d+'|'+x.title!==k);save();publishConf(null);});});};
+V.mine=()=>{const t=ADMIN?(ui.tab||'att'):(ui.tab&&ui.tab!=='att'?ui.tab:'mt');const P=ui.p||'';const days=S.att[P]||{};const ks=Object.keys(days).sort().reverse().slice(0,40);
+ return bar('記録を見る','home')+`<div class="wrap"><div class="seg">${ADMIN?`<div class="${t==='att'?'on':''}" data-tab="att">勤務</div>`:''}<div class="${t==='mt'?'on':''}" data-tab="mt">メンテ</div><div class="${t==='ph'?'on':''}" data-tab="ph">写真</div></div>
+ ${t==='att'&&ADMIN?`<div class="card">${whoChips(P,'data-p')}</div>${P?`<div class="card"><table>`:''}${P?`<tr><th>日付</th><th>出勤</th><th>退勤</th><th>勤務</th></tr>${ks.map(k=>{const a=days[k];return `<tr><td>${md(k)}（${wd(k)}）</td><td>${a.in?hm(a.in):''}</td><td>${a.out?hm(a.out):'—'}</td><td>${r1(attCalc(a,P)/60)}h</td></tr>`;}).join('')}</table>${ks.length?'':'<p class="note">まだありません。</p>'}</div>`:''}`:''}
+ ${t==='mt'?`<div class="card"><h2>みんなのメンテ記録</h2>${allMaint().slice(0,60).map(x=>`<div class="li"><div class="t"><b>${md(x.d)}</b> ${esc(x.mc)}｜${esc(x.w)}${x.r?`｜<span style="color:${x.r==='異常なし'?'var(--main)':'var(--stop)'}">${esc(x.r)}</span>`:''}<div class="note">${esc(x.who)}${x.memo?'・'+esc(x.memo):''}${x.mine?'（この端末）':''}</div></div></div>`).join('')||'<p class="note">まだありません。</p>'}</div>`:''}
+ ${t==='ph'?`<div class="card"><div class="thumbs">${S.photos.slice().reverse().map(p=>`<figure>${p.img?`<img src="${p.img}">`:''}<figcaption>${md(p.d)} ${esc(p.cat)}</figcaption></figure>`).join('')}</div>${S.photos.length?'':'<p class="note">まだありません。</p>'}</div>`:''}</div>`;};
+B.mine=()=>{$$('[data-tab]').forEach(el=>el.onclick=()=>{ui.tab=el.dataset.tab;render();});$$('[data-p]').forEach(el=>el.onclick=()=>{ui.p=el.dataset.p;render();});};
+
+/* ----- 設定 ----- */
+V.settings=()=>{if(!ADMIN){view='home';return V.home();}const t=ui.tab||'staff';const tabs=[['staff','名前'],['proc','工程'],['mc','機械'],['ct','カートン'],['send','送信先'],['case','案件']];
+ const lst=(k,label)=>`<div class="card"><h2>${label}</h2>${cfg(k).map((n,i)=>`<div class="li"><span class="t">${esc(n)}</span><button class="x" data-del="${k}:${i}">×</button></div>`).join('')||'<p class="note">まだありません。</p>'}
+   <div class="addrow"><input id="add_${k}" placeholder="追加する${label}"><button class="btn fill sm" data-add="${k}">追加</button></div></div>`;
+ const fOK=cfg('forms')&&cfg('forms').includes('QQKIND')&&cfg('forms').includes('QQBODY');
+ let body='';
+ if(t==='staff'){const e=ui.edit;const pf=e?prof(e):null;
+  body=`<div class="card"><h2>名前・勤務時間</h2>${cfg('staff').map((n,i)=>`<div class="li"><span class="t" data-edit="${esc(n)}" style="cursor:pointer"><b>${esc(n)}</b> <span class="note">${esc(prof(n).type)} ${esc(prof(n).start)}〜${esc(prof(n).end)} ✎</span></span><button class="x" data-del="staff:${i}">×</button></div>
+   ${e===n?`<div style="background:var(--main2);border-radius:16px;padding:12px;margin-bottom:8px">
+    <div class="note">区分</div><div class="chips c2">${['正社員','パート'].map(x=>`<div class="chip ${pf.type===x?'on':''}" data-pt="${x}">${x}</div>`).join('')}</div>
+    <div class="note" style="margin-top:8px">始業</div><div class="chips c4">${['08:00','08:30','09:00','09:30','10:00','13:00'].map(x=>`<div class="chip ${pf.start===x?'on':''}" data-ps="${x}">${x}</div>`).join('')}</div>
+    <div class="note" style="margin-top:8px">終業</div><div class="chips c4">${['12:00','14:00','15:00','16:00','17:00','17:30'].map(x=>`<div class="chip ${pf.end===x?'on':''}" data-pe="${x}">${x}</div>`).join('')}</div>
+    <div class="note" style="margin-top:8px">休憩（自動で引く）</div><div class="chips c2">${['12:00-13:00','12:00-12:45','10:00-10:15','15:00-15:15'].map(x=>`<div class="chip ${pf.breaks.includes(x)?'on':''}" data-pb="${x}">${x}</div>`).join('')}</div></div>`:''}`).join('')||'<p class="note">まだいません。</p>'}
+   <div class="addrow"><input id="add_staff" placeholder="追加する名前"><button class="btn fill sm" data-add="staff">追加</button></div>
+   <p class="note">名前をタップすると勤務時間を設定できます（正社員 8:30〜17:30／パートは人ごと）。</p></div>`;}
+ if(t==='proc')body=lst('preProcs','前加工の作業')+lst('hariParts','貼りの部品')+lst('hariMethods','貼り方')+`<div class="card"><h2>紙の置き場</h2>${cfg('paperLocs').map((n,i)=>`<div class="li"><span class="t">${esc(n)}</span><button class="btn sm" data-plren="${i}">名前を変える</button><button class="x" data-del="paperLocs:${i}">×</button></div>`).join('')}
+   <div class="addrow"><input id="add_paperLocs" placeholder="追加する置き場（例：棚4）"><button class="btn fill sm" data-add="paperLocs">追加</button></div>
+   <p class="note">名前を変えると、その置き場にある紙もまとめて新しい名前になります（台帳にも反映）。</p></div>`;
+ if(t==='mc')body=lst('machines','機械');
+ if(t==='ct')body=`<div class="card"><h2>カートン（内寸・重さ）</h2>${cartons().map((c,i)=>`<div class="li"><span class="t"><b>${esc(c.id)}</b> <span class="note">${esc(c.size)}サイズ・${c.L}×${c.W}×${c.H}</span></span>
+   <input type="number" inputmode="numeric" data-cg="${i}" value="${c.g}" style="width:84px;padding:8px"><span class="note">g</span><button class="x" data-cdel="${i}">×</button></div>`).join('')}
+   <p class="note">重さ（g）を書き換えると、すぐ梱包の計算に使われます。</p></div>
+   <div class="card"><h2>カートンを追加</h2>
+   <div class="chips c2"><div><span class="lbl">名前</span><input id="cN" placeholder="例：IS-100B"></div><div><span class="lbl">サイズ</span><input id="cS" placeholder="例：100"></div></div>
+   <div class="chips" style="margin-top:8px">${['L','W','H'].map((k,i)=>`<div><span class="lbl">内寸 ${['長さ','幅','高さ'][i]}</span><input type="number" inputmode="numeric" id="c${k}"></div>`).join('')}</div>
+   <label class="f">重さ（g）</label><input type="number" inputmode="numeric" id="cG">
+   <button class="btn fill block" id="cAdd">追加</button><button class="btn sm block" id="cReset" style="margin-top:8px">最初の8種類に戻す</button></div>
+   <div class="card"><h2>梱包の計算ルール</h2>${(()=>{const o=Object.assign({sheet:2,gap:5,maxKg:20},cfg('packOpt')||{});return `<div class="chips">
+   <div><span class="lbl">敷紙の厚み mm（上下に1枚ずつ）</span><input type="number" inputmode="decimal" id="poS" value="${o.sheet}"></div>
+   <div><span class="lbl">緩衝材のすき間 mm（各面）</span><input type="number" inputmode="decimal" id="poG" value="${o.gap}"></div>
+   <div><span class="lbl">1箱の重さの上限 kg</span><input type="number" inputmode="decimal" id="poM" value="${o.maxKg}"></div></div>`;})()}
+   <button class="btn fill block" id="poSave" style="margin-top:8px">保存</button></div>`;
+ if(t==='time_old')body=`<div class="card"><label class="f" style="margin-top:0">始業時刻</label><div class="chips c4">${['08:00','08:30','09:00','09:30'].map(x=>`<div class="chip ${cfg('workStart')===x?'on':''}" data-ws="${x}">${x}</div>`).join('')}</div>
+   <label class="f">休憩（自動で引く）</label><div class="chips c2">${['10:00-10:15','12:00-13:00','15:00-15:15','12:00-12:45'].map(x=>`<div class="chip ${cfg('breaks').includes(x)?'on':''}" data-br="${x}">${x}</div>`).join('')}</div></div>`;
+ if(t==='send')body=`<div class="card"><h2>Forms 入力済みリンク</h2><textarea id="sForms" rows="4" placeholder="https://forms.office.com/...">${esc(cfg('forms'))}</textarea>
+   <p class="note">${cfg('forms')?(fOK?'✓ 種別・記録の2項目を確認できました':'QQKIND と QQBODY が見つかりません。入力済みリンクを作り直してください'):'未設定'}</p><button class="btn fill block" id="sFormsSave">保存</button></div>
+   <div class="card"><h2>不良アプリ（AppSheet）のリンク</h2><input id="sDef" value="${esc(cfg('defectUrl')||'')}" placeholder="https://www.appsheet.com/start/..."><p class="note">入れると、ホームの「不良」ボタンがこのアプリを開きます。</p><button class="btn fill block" id="sDefSave">保存</button></div>`;
+ if(t==='case')body=`<div class="card"><h2>受注一覧からの読み込み</h2><p class="note" style="margin-top:0">${dataState==='ok'?`${esc(DATA.updated)} 時点・${DATA.cases.length}件。受注一覧は読むだけで、書き換えません。`:'読み込めていません'}</p></div>
+   <div class="card"><h2>一覧にない案件を追加（この端末だけ）</h2>${S.extraCases.map((c,i)=>`<div class="li"><span class="t">${esc(c.client)}｜${esc(c.item)}</span><button class="x" data-xc="${i}">×</button></div>`).join('')}
+   <input id="xcC" placeholder="得意先" style="margin-top:8px"><input id="xcI" placeholder="品名" style="margin-top:8px"><input id="xcQ" type="number" inputmode="numeric" placeholder="数量" style="margin-top:8px">
+   <button class="btn block" id="xcAdd">追加</button></div>`;
+ const dk=dirtyKeys();const lock=!ADMIN&&t!=='case';
+ const pv=`<button class="btn sm block" id="pvStaff" style="margin-bottom:10px">👀 スタッフの画面で見てみる</button><button class="btn sm block" id="devReset" style="margin-bottom:10px">🧹 この端末のテスト記録を消す</button>`;
+ const head=ADMIN?pv+(dk.length?`<div class="card" style="border:2px solid var(--main)"><b>まだこの端末だけの変更があります</b><p class="note" style="margin:4px 0 8px">名前・工程・機械・カートンなどを全員の端末に反映します。</p><button class="btn fill big block" id="pubConf">全員に反映する</button><a href="#" id="dropConf" class="note">変更を取り消す</a></div>`
+   :`<p class="note" style="margin:0 0 10px">管理者モード：ここで変えた設定は「全員に反映する」で全端末に配られます。${CONF.updated?'最終反映 '+esc(CONF.updated):''}</p>`)
+   :ADMIN===null?`<p class="note">確認中…</p>`:`<div class="card"><b>🔒 設定は管理者（社長）が変更します</b><p class="note" style="margin:4px 0 0">ここでは見るだけです。${CONF.updated?'最終反映 '+esc(CONF.updated):''}</p></div>`;
+ return bar('設定','home')+`<div class="wrap">${head}<div class="card" style="padding:12px 14px"><div class="note">この端末の名前（いまの現場に表示）</div><div class="addrow"><input id="devName" value="${esc(S.devName||'')}" placeholder="例：貼りラインiPad"><button class="btn fill sm" id="devSave">保存</button></div></div><div class="seg" style="font-size:13px;white-space:nowrap">${tabs.map(([k,l])=>`<div class="${t===k?'on':''}" data-tab="${k}">${l}</div>`).join('')}</div><div class="${lock?'ro':''}">${body}</div>
+  </div>`;};
+B.settings=()=>{const after=()=>{save();render();};
+  const dr=$('#devReset');if(dr)dr.onclick=()=>confirmSheet('この端末に残っている記録（作業中・未送信・出退勤・メンテ・写真・重量・送信の控え・今月の件数）を消します。設定と合言葉はそのままです。元に戻せません。消しますか？','消す',()=>{
+    ['jobs','unsent','sentLog','doneLog','maint','photos','weights','kaizenLog','paperLog'].forEach(k=>S[k]=[]);S.att={};S.cnt={};S.goalSeen='';homeHK='';save();view='home';render();toast('この端末の記録を消しました');});
+  const pvb=$('#pvStaff');if(pvb)pvb.onclick=()=>{ADMIN=false;view='home';render();toast('スタッフの画面です。下のボタンで戻れます');};
+  const dv=$('#devSave');if(dv)dv.onclick=()=>{S.devName=$('#devName').value.trim();toast('保存しました');after();};
+  const dc=$('#dropConf');if(dc)dc.onclick=e=>{e.preventDefault();confirmSheet('この端末の変更を取り消して、全員の設定に戻しますか？','取り消す',()=>{SHARED_KEYS.forEach(k=>S[k]=null);after();});};
+  const pc=$('#pubConf');if(pc)pc.onclick=()=>publishConf(pc);
+  $$('[data-tab]').forEach(el=>el.onclick=()=>{ui.tab=el.dataset.tab;render();});
+  $$('[data-plren]').forEach(el=>el.onclick=()=>{const a=cfg('paperLocs').slice(),i=+el.dataset.plren,old=a[i];
+    const m=sheet(`<h2 style="margin:0 0 6px">置き場の名前を変える</h2><p class="note">「${esc(old)}」の新しい名前</p><input id="plN" value="${esc(old)}"><button class="btn fill big block" id="plOk" style="margin-top:10px">変える（全員に反映）</button><button class="btn block" id="plNo">やめる</button>`);
+    m.querySelector('#plNo').onclick=()=>m.remove();
+    m.querySelector('#plOk').onclick=async()=>{const v=m.querySelector('#plN').value.trim();if(!v||v===old){m.remove();return;}if(a.includes(v)){toast('同じ名前があります');return;}
+      a[i]=v;S.paperLocs=a;S.paperLocMap=Object.assign({},S.paperLocMap||{},{[old]:v});save();m.remove();
+      const rec=queue({QQKIND:'紙',QQDATE:ymd(Date.now()),QQPART:`${old}｜｜${v}`,QQWORKERS:S.lastWho||'社長',QQGOOD:'0',QQMEMO:'置き場名変更・'+old+'→'+v});
+      await publishConf();render();sendSheet(rec,`「${old}」を「${v}」に変えました（台帳にも反映するため送ってね）`);};});
+  $$('[data-add]').forEach(el=>el.onclick=()=>{const k=el.dataset.add,v=$('#add_'+k).value.trim();if(!v)return;const a=cfg(k).slice();if(a.includes(v)){toast('すでにあります');return;}a.push(v);S[k]=a;after();});
+  $$('[data-del]').forEach(el=>el.onclick=()=>{const [k,i]=el.dataset.del.split(':');const a=cfg(k).slice();confirmSheet(`「${a[i]}」を消しますか？`,'消す',()=>{a.splice(+i,1);S[k]=a;after();});});
+  $$('[data-ws]').forEach(el=>el.onclick=()=>{S.workStart=el.dataset.ws;after();});
+  $$('[data-edit]').forEach(el=>el.onclick=()=>{ui.edit=ui.edit===el.dataset.edit?'':el.dataset.edit;render();});
+  const setP=(fn)=>{const n=ui.edit;const all=Object.assign({},cfg('profiles')||{});const cur=prof(n);fn(cur);all[n]=cur;S.profiles=all;after();};
+  $$('[data-pt]').forEach(el=>el.onclick=()=>setP(c=>{c.type=el.dataset.pt;if(c.type==='正社員'){c.start='08:30';c.end='17:30';c.breaks=['12:00-13:00'];}else{c.start='09:00';c.end='16:00';}}));
+  $$('[data-ps]').forEach(el=>el.onclick=()=>setP(c=>c.start=el.dataset.ps));
+  $$('[data-pe]').forEach(el=>el.onclick=()=>setP(c=>c.end=el.dataset.pe));
+  $$('[data-pb]').forEach(el=>el.onclick=()=>setP(c=>{const v=el.dataset.pb;c.breaks=c.breaks.includes(v)?c.breaks.filter(x=>x!==v):c.breaks.concat(v);}));
+  $$('[data-br]').forEach(el=>el.onclick=()=>{const v=el.dataset.br,a=cfg('breaks').slice();S.breaks=a.includes(v)?a.filter(x=>x!==v):a.concat(v);after();});
+  const cs=()=>cartons().map(c=>Object.assign({},c));
+  $$('[data-cg]').forEach(el=>el.onchange=()=>{const a=cs();a[+el.dataset.cg].g=+el.value||0;S.cartons=a;save();toast('保存しました');});
+  $$('[data-cdel]').forEach(el=>el.onclick=()=>{const a=cs();if(a.length<2){toast('最低1つは必要です');return;}confirmSheet(`「${a[+el.dataset.cdel].id}」を消しますか？`,'消す',()=>{a.splice(+el.dataset.cdel,1);S.cartons=a;after();});});
+  const ca=$('#cAdd');if(ca)ca.onclick=()=>{const v=k=>$('#c'+k).value.trim();const c={id:v('N'),size:v('S'),L:+v('L'),W:+v('W'),H:+v('H'),g:+v('G')||0};
+    if(!c.id||!c.L||!c.W||!c.H){toast('名前と内寸3つを入れてください');return;}const a=cs();if(a.some(x=>x.id===c.id)){toast('同じ名前があります');return;}a.push(c);S.cartons=a;after();toast('追加しました');};
+  const po=$('#poSave');if(po)po.onclick=()=>{S.packOpt={sheet:+$('#poS').value||0,gap:+$('#poG').value||0,maxKg:+$('#poM').value||0};toast('保存しました');after();};
+  const cr=$('#cReset');if(cr)cr.onclick=()=>confirmSheet('カートンを最初の8種類に戻しますか？','戻す',()=>{S.cartons=null;after();});
+  const sd=$('#sDefSave');if(sd)sd.onclick=()=>{const v=$('#sDef').value.trim();if(v&&!/^https:\/\//.test(v)){toast('https:// から始まるリンクを入れてください');return;}S.defectUrl=v;toast('保存しました');after();};
+  const fs=$('#sFormsSave');if(fs)fs.onclick=()=>{S.forms=$('#sForms').value.trim();toast('保存しました');after();};
+  const xa=$('#xcAdd');if(xa)xa.onclick=()=>{const c={client:$('#xcC').value.trim(),item:$('#xcI').value.trim(),qty:$('#xcQ').value.trim()};if(!c.item){toast('品名を入れてください');return;}
+    c.key=c.client+'｜'+c.item;S.extraCases.push(c);after();};
+  $$('[data-xc]').forEach(el=>el.onclick=()=>{S.extraCases.splice(+el.dataset.xc,1);after();});
+};
+
+render();
+</script>
+</body>
+</html>
