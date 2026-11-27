@@ -323,7 +323,7 @@ const HK={
 };
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const KIND_MOOD={'作業日報':'happy','勤怠':'sleepy','メンテ':'thanks','改善提案':'lid_open','重量':'thanks','梱包':'thanks','不良':'bow'};
-const KIND_HK={'作業日報':'done','勤怠':'out','清掃':'clean','メンテ':'maint','改善提案':'idea','重量':'weight','不良':'defect'};
+const KIND_HK={'写真':'done','作業日報':'done','勤怠':'out','清掃':'clean','メンテ':'maint','改善提案':'idea','重量':'weight','不良':'defect'};
 let homeHK='';
 function confetti(n){const cs=['#4f9a78','#e3a86a','#d9685a','#5b97c9','#f2c94c','#9b7fd1'];for(let i=0;i<n;i++){const e=document.createElement('span');e.className='confetti';
   e.style.left=Math.random()*100+'vw';e.style.background=cs[i%cs.length];e.style.animationDelay=(Math.random()*0.6)+'s';e.style.borderRadius=(i%3?'2px':'50%');document.body.appendChild(e);setTimeout(()=>e.remove(),3200);}}
@@ -353,7 +353,7 @@ const V={}, B={};
 
 /* ----- ホーム ----- */
 const ROLES={'':'すべて使う','att':'勤怠専用（入口に置く端末）','work':'作業用（出退勤を出さない）'};
-const APP_VER='11/27 13:00';   // 画面の一番下に表示（どの版で開いているか確認用）
+const APP_VER='11/27 22:00';   // 画面の一番下に表示（どの版で開いているか確認用）
 const role=()=>S.role!==undefined&&S.role!==null?S.role:(REAL_ADMIN?'':'work');   // スタッフの端末は、決めていなければ「作業用」
 function roleFoot(){return `<p class="note" style="margin:4px 0 0;text-align:center;font-size:11px">アプリの版：${APP_VER}</p><p class="note" style="margin-top:6px;text-align:center"><a href="#" id="roleBtn" style="color:inherit">この端末の役割：${esc(ROLES[role()]||ROLES[''])} ▸</a></p>`;}
 function roleSheet(){const m=sheet(`<h2 style="margin-top:0">この端末の役割</h2><p class="note">端末ごとに決めます。まちがって押すのを防ぐための設定です。</p>
@@ -796,20 +796,28 @@ V.photo=()=>{const f=ui.f||(ui.f={cat:'',key:''});const recent=nearCases();
   ${BOARD.photos?`<div class="hkb" style="margin-top:0">📷 Dropboxに届いた写真（全員分）：今日 <b>${(BOARD.photos[ymd(Date.now())]||0)}</b>枚・この7日 <b>${Object.entries(BOARD.photos).filter(([d])=>d>=ymd(Date.now()-6*86400000)).reduce((a,[,n])=>a+n,0)}</b>枚<span class="note">（${esc(BOARD.updated||'')}時点）</span></div>`:''}
   <label class="f" style="margin-top:0">① 分類</label><div class="chips">${PCAT().length?'':'<p class="note">送信先がまだ読み込めていません。少し待つか、管理者に確認してください。</p>'}${PCAT().map(x=>`<div class="chip ${f.cat===x?'on':''}" data-cat="${esc(x)}">${esc(x)}</div>`).join('')}</div>
   <label class="f">② 案件（任意）</label><div class="pchips">${recent.map(c=>`<div class="pchip ${f.key===c.key?'on':''}" data-pk="${esc(c.key)}">${esc((c.item||'').slice(0,16))}</div>`).join('')}<div class="pchip ${f.key==='__none'?'on':''}" data-pk="__none">指定なし</div></div>
+  <label class="f">品名（一覧にないときは手入力）</label><input id="pItem" placeholder="例：桐箱用台紙" value="${esc(f.item||'')}">
+  <label class="f">メモ（任意）</label><textarea id="pMemo" rows="2" placeholder="例：要専用カートン検討">${esc(f.memo||'')}</textarea>
+  <p class="note">品名かメモを書いたときは、写真のあとに「メモを送る」画面が出ます（Formsで送信）。</p>
   <label class="f">③ 写真を選ぶ（この端末の記録用）</label><input type="file" accept="image/*" id="pFile">
   <div id="pPrev" class="thumbs" style="margin-top:8px"></div>
   <a class="btn blue big block ${f.cat?'':'hidden'}" id="pSend" href="${esc(cfg('photo')[f.cat]||'#')}" target="_blank" rel="noopener">④ Dropboxに送る（${esc(f.cat||'')}）</a>
   <p class="note">④を押すとDropboxの送信画面が開きます。同じ写真を選んで「アップロード」を押してください。写真は分類ごとのフォルダに入ります。</p></div>
-  <div class="card"><h2>この端末で送った写真</h2>${S.photos.length?`<div class="thumbs">${S.photos.slice().reverse().slice(0,30).map(p=>`<figure>${p.img?`<img src="${p.img}">`:'<div style="aspect-ratio:1;background:#eee;border-radius:8px"></div>'}<figcaption>${md(p.d)} ${esc(p.cat)}<br>${esc((p.item||'').slice(0,12))}</figcaption></figure>`).join('')}</div>`:'<p class="note">まだありません。</p>'}</div></div>`;};
+  <div class="card"><h2>この端末で送った写真</h2>${S.photos.length?`<div class="thumbs">${S.photos.slice().reverse().slice(0,30).map(p=>`<figure>${p.img?`<img src="${p.img}">`:'<div style="aspect-ratio:1;background:#eee;border-radius:8px"></div>'}<figcaption>${md(p.d)} ${esc(p.cat)}<br>${esc((p.item||'').slice(0,12))}${p.memo?'<br>'+esc(p.memo.slice(0,16)):''}</figcaption></figure>`).join('')}</div>`:'<p class="note">まだありません。</p>'}</div></div>`;};
 B.photo=()=>{const f=ui.f;
   $$('[data-cat]').forEach(el=>el.onclick=()=>{f.cat=el.dataset.cat;render();});
   $$('[data-pk]').forEach(el=>el.onclick=()=>{f.key=el.dataset.pk;render();});
+  $('#pItem').oninput=e=>{f.item=e.target.value;};$('#pMemo').oninput=e=>{f.memo=e.target.value;};
   $('#pFile').onchange=e=>{const file=e.target.files[0];if(!file)return;const img=new Image();const u=URL.createObjectURL(file);
     img.onload=()=>{const c=document.createElement('canvas');const s=Math.min(1,320/Math.max(img.width,img.height));c.width=img.width*s;c.height=img.height*s;
       c.getContext('2d').drawImage(img,0,0,c.width,c.height);f.thumb=c.toDataURL('image/jpeg',0.6);$('#pPrev').innerHTML=`<figure><img src="${f.thumb}"></figure>`;URL.revokeObjectURL(u);};img.src=u;};
   const s=$('#pSend');if(s)s.addEventListener('click',()=>{const c=f.key&&f.key!=='__none'?caseBy(f.key):null;
-    S.photos.push({d:ymd(Date.now()),cat:f.cat,item:c?c.item:'',img:f.thumb||''});if(S.photos.length>60)S.photos=S.photos.slice(-60);
-    const n=bump('photo');save();f.thumb='';setTimeout(()=>{render();celebrate('photo','送信画面を開いたよ',n,'Dropboxの画面で写真を選んで「アップロード」まで押してね。届いた枚数は次の集計で上に出ます。');},700);});
+    const it=(f.item||'').trim(),mm=(f.memo||'').trim();
+    S.photos.push({d:ymd(Date.now()),cat:f.cat,item:it||(c?c.item:''),memo:mm,img:f.thumb||''});if(S.photos.length>60)S.photos=S.photos.slice(-60);
+    const n=bump('photo');let rec=null;
+    if(it||mm)rec=queue({QQKIND:'写真',QQDATE:ymd(Date.now()),QQCASE:c?c.key:'',QQPART:[f.cat,it].filter(Boolean).join('｜'),QQWORKERS:S.name||'',QQMEMO:mm});
+    save();f.thumb='';f.item='';f.memo='';
+    setTimeout(()=>{render();if(rec)sendSheet(rec,'写真のメモを記録しました');else celebrate('photo','送信画面を開いたよ',n,'Dropboxの画面で写真を選んで「アップロード」まで押してね。届いた枚数は次の集計で上に出ます。');},700);});
 };
 
 /* ----- 梱包・重量 ----- */
